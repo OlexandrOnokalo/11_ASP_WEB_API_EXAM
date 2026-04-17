@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Cars.API/Cars.API.csproj" />
+  <Project Path="Cars.BLL/Cars.BLL.csproj" />
+  <Project Path="Cars.DAL/Cars.DAL.csproj" />
+</Solution>
