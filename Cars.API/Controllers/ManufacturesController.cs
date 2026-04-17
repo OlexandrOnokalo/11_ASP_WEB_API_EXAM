@@ -2,6 +2,7 @@ using Cars.API.Models;
 using Cars.BLL.Dtos.Common;
 using Cars.BLL.Dtos.Manufacture;
 using Cars.BLL.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cars.API.Controllers
@@ -36,6 +37,7 @@ namespace Cars.API.Controllers
             return Ok(new ApiResponseDto<ManufactureItemDto> { Data = result });
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> CreateAsync([FromBody] CreateManufactureDto dto)
         {
@@ -43,6 +45,7 @@ namespace Cars.API.Controllers
             return CreatedAtRoute("GetManufactureById", new { id = created.Id }, new ApiResponseDto<ManufactureItemDto> { Data = created });
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateManufactureDto dto)
         {
@@ -55,6 +58,7 @@ namespace Cars.API.Controllers
             return Ok(new ApiResponseDto<ManufactureItemDto> { Data = updated });
         }
 
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {

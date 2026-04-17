@@ -1,9 +1,11 @@
 using Cars.DAL.Entities;
+using Cars.DAL.Entities.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cars.DAL
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<AppUserEntity, AppRoleEntity, string>
     {
         public AppDbContext(DbContextOptions options)
             : base(options)
@@ -12,6 +14,7 @@ namespace Cars.DAL
 
         public DbSet<ManufactureEntity> Manufactures { get; set; }
         public DbSet<CarEntity> Cars { get; set; }
+        public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -62,6 +65,32 @@ namespace Cars.DAL
                     .WithMany(x => x.Cars)
                     .HasForeignKey(x => x.ManufactureId)
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<RefreshTokenEntity>(e =>
+            {
+                e.HasKey(x => x.Id);
+
+                e.Property(x => x.Token)
+                    .IsRequired()
+                    .HasMaxLength(512);
+
+                e.HasIndex(x => x.Token)
+                    .IsUnique();
+
+                e.Property(x => x.Expires)
+                    .IsRequired();
+
+                e.Property(x => x.IsUsed)
+                    .IsRequired();
+
+                e.Property(x => x.UserId)
+                    .IsRequired();
+
+                e.HasOne(x => x.User)
+                    .WithMany(x => x.RefreshTokens)
+                    .HasForeignKey(x => x.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

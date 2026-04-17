@@ -1,4 +1,10 @@
 <Solution>
+  <Project Path="../11_ASP_WEB_API/Books.API/Books.API.csproj" />
+  <Project Path="../11_ASP_WEB_API/Books.BLL/Books.BLL.csproj" />
+  <Project Path="../11_ASP_WEB_API/Books.DAL/Books.DAL.csproj" />
+  <Project Path="../11_ASP_WEB_API_potapchukdmytro/back/PD411_Books.API/PD411_Books.API.csproj" />
+  <Project Path="../11_ASP_WEB_API_potapchukdmytro/back/PD411_Books.BLL/PD411_Books.BLL.csproj" />
+  <Project Path="../11_ASP_WEB_API_potapchukdmytro/back/PD411_Books.DAL/PD411_Books.DAL.csproj" />
   <Project Path="Cars.API/Cars.API.csproj" />
   <Project Path="Cars.BLL/Cars.BLL.csproj" />
   <Project Path="Cars.DAL/Cars.DAL.csproj" />

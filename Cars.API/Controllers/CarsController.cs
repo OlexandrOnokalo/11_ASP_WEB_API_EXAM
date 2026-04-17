@@ -2,6 +2,7 @@ using Cars.API.Models;
 using Cars.BLL.Dtos.Car;
 using Cars.BLL.Dtos.Common;
 using Cars.BLL.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cars.API.Controllers
@@ -67,6 +68,7 @@ namespace Cars.API.Controllers
             return Ok(new ApiResponseDto<PagedDataDto<CarItemDto>> { Data = result });
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> CreateAsync([FromBody] CreateCarDto dto)
         {
@@ -74,6 +76,7 @@ namespace Cars.API.Controllers
             return CreatedAtRoute("GetCarById", new { id = created.Id }, new ApiResponseDto<CarItemDto> { Data = created });
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateCarDto dto)
         {
@@ -86,6 +89,7 @@ namespace Cars.API.Controllers
             return Ok(new ApiResponseDto<CarItemDto> { Data = updated });
         }
 
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
