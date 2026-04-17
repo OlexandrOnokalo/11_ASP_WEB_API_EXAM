@@ -1,3 +1,4 @@
+using AutoMapper;
 using Cars.BLL.Dtos.Common;
 using Cars.BLL.Dtos.Manufacture;
 using Cars.DAL;
@@ -9,10 +10,12 @@ namespace Cars.BLL.Services
     public class ManufactureService
     {
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public ManufactureService(AppDbContext context)
+        public ManufactureService(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<PagedDataDto<ManufactureItemDto>> GetAllAsync(int page, int pageSize)
@@ -22,15 +25,12 @@ namespace Cars.BLL.Services
             var query = _context.Manufactures.AsNoTracking().OrderBy(x => x.Id);
 
             var totalCount = await query.CountAsync();
-            var items = await query
+            var entities = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(x => new ManufactureItemDto
-                {
-                    Id = x.Id,
-                    Name = x.Name
-                })
                 .ToListAsync();
+
+            var items = _mapper.Map<List<ManufactureItemDto>>(entities);
 
             return new PagedDataDto<ManufactureItemDto>
             {
@@ -43,15 +43,11 @@ namespace Cars.BLL.Services
 
         public async Task<ManufactureItemDto?> GetByIdAsync(int id)
         {
-            return await _context.Manufactures
+            var entity = await _context.Manufactures
                 .AsNoTracking()
-                .Where(x => x.Id == id)
-                .Select(x => new ManufactureItemDto
-                {
-                    Id = x.Id,
-                    Name = x.Name
-                })
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            return entity == null ? null : _mapper.Map<ManufactureItemDto>(entity);
         }
 
         public async Task<ManufactureItemDto> CreateAsync(CreateManufactureDto dto)
@@ -66,19 +62,13 @@ namespace Cars.BLL.Services
                 throw new ArgumentException("Manufacture with this name already exists.");
             }
 
-            var entity = new ManufactureEntity
-            {
-                Name = name
-            };
+            var entity = _mapper.Map<ManufactureEntity>(dto);
+            entity.Name = name;
 
             _context.Manufactures.Add(entity);
             await _context.SaveChangesAsync();
 
-            return new ManufactureItemDto
-            {
-                Id = entity.Id,
-                Name = entity.Name
-            };
+            return _mapper.Map<ManufactureItemDto>(entity);
         }
 
         public async Task<ManufactureItemDto?> UpdateAsync(int id, UpdateManufactureDto dto)
@@ -104,14 +94,12 @@ namespace Cars.BLL.Services
                 throw new ArgumentException("Manufacture with this name already exists.");
             }
 
+            _mapper.Map(dto, entity);
             entity.Name = name;
+
             await _context.SaveChangesAsync();
 
-            return new ManufactureItemDto
-            {
-                Id = entity.Id,
-                Name = entity.Name
-            };
+            return _mapper.Map<ManufactureItemDto>(entity);
         }
 
         public async Task<bool> DeleteAsync(int id)

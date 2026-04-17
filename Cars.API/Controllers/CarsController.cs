@@ -1,4 +1,5 @@
 using Cars.API.Models;
+using Cars.API.Settings;
 using Cars.BLL.Dtos.Car;
 using Cars.BLL.Dtos.Common;
 using Cars.BLL.Services;
@@ -12,10 +13,15 @@ namespace Cars.API.Controllers
     public class CarsController : ControllerBase
     {
         private readonly CarService _carService;
+        private readonly string _carsPath;
 
-        public CarsController(CarService carService)
+        public CarsController(CarService carService, IWebHostEnvironment environment)
         {
             _carService = carService;
+
+            string rootPath = environment.ContentRootPath;
+            _carsPath = Path.Combine(rootPath, StaticFilesSettings.StorageDir, StaticFilesSettings.CarsDir);
+            Directory.CreateDirectory(_carsPath);
         }
 
         [HttpGet]
@@ -70,17 +76,17 @@ namespace Cars.API.Controllers
 
         [Authorize(Roles = "admin")]
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromBody] CreateCarDto dto)
+        public async Task<IActionResult> CreateAsync([FromForm] CreateCarDto dto)
         {
-            var created = await _carService.CreateAsync(dto);
+            var created = await _carService.CreateAsync(dto, _carsPath);
             return CreatedAtRoute("GetCarById", new { id = created.Id }, new ApiResponseDto<CarItemDto> { Data = created });
         }
 
         [Authorize(Roles = "admin")]
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateCarDto dto)
+        public async Task<IActionResult> UpdateAsync(int id, [FromForm] UpdateCarDto dto)
         {
-            var updated = await _carService.UpdateAsync(id, dto);
+            var updated = await _carService.UpdateAsync(id, dto, _carsPath);
             if (updated == null)
             {
                 return NotFound(new ErrorResponseDto { Message = "Car not found." });
@@ -93,7 +99,7 @@ namespace Cars.API.Controllers
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            bool deleted = await _carService.DeleteAsync(id);
+            bool deleted = await _carService.DeleteAsync(id, _carsPath);
             if (!deleted)
             {
                 return NotFound(new ErrorResponseDto { Message = "Car not found." });

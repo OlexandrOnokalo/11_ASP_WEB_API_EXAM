@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 namespace Cars.BLL.Dtos.Car
@@ -29,8 +30,9 @@ namespace Cars.BLL.Dtos.Car
 
         public string? Description { get; set; }
 
-        [MaxLength(500)]
-        [Url]
-        public string? Image { get; set; }
+        // Тимчасова сумісність з фронтом (описка у полі)
+        public string? Desciption { get; set; }
+
+        public IFormFile? Image { get; set; }
     }
 }
