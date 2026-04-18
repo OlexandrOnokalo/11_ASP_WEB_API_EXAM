@@ -5,8 +5,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import { object, number, string } from "yup";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useDispatch } from "react-redux";
+import { api } from "../../api";
+import { getEntity, getItems } from "../../services/responseParsers";
+import { toImageSrc } from "../../services/imageUrl";
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: "flex",
@@ -32,15 +34,13 @@ export default function CarUpdateForm(){
     const [initial, setInitial] = useState(null);
 
     useEffect(()=> {
-        axios.get(import.meta.env.VITE_MANUFACTURES_URL, { params: { page:1, page_size:200 }}).then(r=>{
-            const data = r.data && r.data.data ? r.data.data : r.data;
-            setManufactures(data.items || data || []);
+        api.get("manufactures", { params: { page:1, page_size:200 }}).then(r=>{
+            setManufactures(getItems(r));
         }).catch(()=>setManufactures([]));
 
         if(id){
-            axios.get(`${import.meta.env.VITE_CARS_URL}/${id}`).then(r=>{
-                const d = r.data && r.data.data ? r.data.data : r.data;
-                setInitial(d);
+            api.get(`cars/${id}`).then(r=>{
+                setInitial(getEntity(r));
             }).catch(()=>setInitial(null));
         }
     },[id]);
@@ -54,29 +54,28 @@ export default function CarUpdateForm(){
             volume: initial.volume || 1.6,
             price: initial.price || 0,
             color: initial.color || '',
-            desciption: initial.desciption || '',
-            image: initial.image || ''
-        } : { name:'', manufactureId:0, year:new Date().getFullYear(), volume:1.6, price:0, color:'', desciption:'', image:'' },
+            description: initial.description || initial.desciption || '',
+            image: null
+        } : { name:'', manufactureId:0, year:new Date().getFullYear(), volume:1.6, price:0, color:'', description:'', image:null },
         validationSchema: schema,
         onSubmit: async (values) => {
             try {
-                await axios.put(`${import.meta.env.VITE_CARS_URL}/${id}`, {
-                    name: values.name,
-                    manufactureId: Number(values.manufactureId),
-                    year: Number(values.year),
-                    volume: Number(values.volume),
-                    price: Number(values.price),
-                    color: values.color,
-                    desciption: values.desciption,
-                    image: values.image
-                });
-                const listRes = await axios.get(import.meta.env.VITE_CARS_URL, { params: { page: 1, page_size: 100 } });
-                const data = listRes.data && listRes.data.data ? listRes.data.data : listRes.data;
-                if(data && data.items) {
-                    dispatch({ type: 'loadcars', payload: data.items });
-                } else if(Array.isArray(data)) {
-                    dispatch({ type: 'loadcars', payload: data });
+                const formData = new FormData();
+                formData.append("name", values.name);
+                formData.append("manufactureId", String(Number(values.manufactureId)));
+                formData.append("year", String(Number(values.year)));
+                formData.append("volume", String(Number(values.volume)));
+                formData.append("price", String(Number(values.price)));
+                formData.append("color", values.color);
+                formData.append("description", values.description || "");
+                formData.append("desciption", values.description || "");
+                if (values.image instanceof File) {
+                    formData.append("image", values.image);
                 }
+
+                await api.put(`cars/${id}`, formData);
+                const listRes = await api.get("cars", { params: { page: 1, page_size: 100 } });
+                dispatch({ type: 'loadcars', payload: getItems(listRes) });
                 navigate(`/cars/${id}`);
             } catch(e){
                 console.error(e);
@@ -97,8 +96,14 @@ export default function CarUpdateForm(){
                     <input name="volume" placeholder="Об'єм" value={formik.values.volume} onChange={formik.handleChange} />
                     <input name="price" placeholder="Ціна" value={formik.values.price} onChange={formik.handleChange} />
                     <input name="color" placeholder="Колір" value={formik.values.color} onChange={formik.handleChange} />
-                    <input name="desciption" placeholder="Опис" value={formik.values.desciption} onChange={formik.handleChange} />
-                    <input name="image" placeholder="URL зображення" value={formik.values.image} onChange={formik.handleChange} />
+                    <input name="description" placeholder="Опис" value={formik.values.description} onChange={formik.handleChange} />
+                    {initial?.image && <img src={toImageSrc(initial.image)} alt={initial.name} style={{ width: "220px", height: "140px", objectFit: "cover" }} />}
+                    <input
+                        type="file"
+                        name="image"
+                        accept="image/*"
+                        onChange={(e) => formik.setFieldValue("image", e.target.files?.[0] || null)}
+                    />
                     <button type="submit">Зберегти</button>
                 </Stack>
             </form>

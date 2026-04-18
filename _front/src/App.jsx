@@ -11,7 +11,7 @@ import DefaultLayout from "./components/layouts/DefaultLayout";
 import CarUpdateForm from "./pages/carsPage/CarUpdateForm";
 import CarDetailsPage from "./pages/carsPage/CarDetailsPage";
 import LoginPage from "./pages/auth/loginPage/LoginPage";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "./context/AuthContext";
 import { ThemeProvider } from "@mui/material";
 import { lightTheme } from "./theme/lightTheme";
@@ -19,16 +19,13 @@ import { darkTheme } from "./theme/darkTheme";
 import RegisterPage from "./pages/auth/registerPage/RegisterPage";
 
 function App() {
-    const { isAuth, login, user } = useAuth();
-
-    useEffect(() => {
-        const authData = localStorage.getItem("auth");
-        if (authData) {
-            login();
-        }
-    }, []);
+    const { isAuth, isAdmin, isHydrated } = useAuth();
 
     const [isDark, setIsDark] = useState(false);
+
+    if (!isHydrated) {
+        return null;
+    }
 
     return (
         <>
@@ -48,7 +45,7 @@ function App() {
                         <Route path="cars">
                             <Route index element={<CarListPage />} />
                             <Route path=":id" element={<CarDetailsPage />} />
-                            {isAuth && user.role === "admin" && (
+                            {isAuth && isAdmin && (
                                 <>
                                     <Route
                                         path="create"
@@ -64,7 +61,7 @@ function App() {
 
                         <Route path="Manufactures">
                             <Route index element={<ManufacturesListPage />} />
-                            {isAuth && user.role === "admin" && (
+                            {isAuth && isAdmin && (
                                 <>
                                     <Route
                                         path="create"

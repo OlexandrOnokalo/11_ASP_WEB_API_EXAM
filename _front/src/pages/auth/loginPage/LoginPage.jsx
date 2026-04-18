@@ -64,7 +64,7 @@ const LoginPage = () => {
     const emailRef = useRef(null);
     const passwordRef = useRef(null);
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { loginRequest } = useAuth();
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -74,7 +74,7 @@ const LoginPage = () => {
         setOpen(false);
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
         const cred = {
@@ -90,21 +90,12 @@ const LoginPage = () => {
             setErrors({});
         }
 
-        const localData = localStorage.getItem("users");
-        if(!localData) {
-            navigate("/register");
-        }
-        const users = JSON.parse(localData);
-
-        const user = users.find(u => u.email === cred.email);
-
-        if(!user || cred.password !== user.password) {
-            alert("Пошта або пароль вказані невірно");
+        const response = await loginRequest(cred);
+        if (!response.success) {
+            alert(response.message || "Пошта або пароль вказані невірно");
             return;
         }
 
-        localStorage.setItem("auth", JSON.stringify(user));
-        login();
         navigate("/", { replace: true });
     };
 

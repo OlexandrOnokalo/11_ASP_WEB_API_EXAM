@@ -11,15 +11,14 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import axios from 'axios';
+import { api } from '../../api';
 
-const ManufacturesCard = ({ manufacture }) => {
+const ManufacturesCard = ({ manufacture, canManage }) => {
     const dispatch = useDispatch();
 
     const deleteClickHandle = async () => {
-        const ManufacturesUrl = import.meta.env.VITE_MANUFACTURES_URL;
         try {
-            await axios.delete(`${ManufacturesUrl}/${manufacture.id}`);
+            await api.delete(`manufactures/${manufacture.id}`);
             dispatch({ type: "deletemanufacture", payload: manufacture.id });
         } catch (error) {
             console.log(error);
@@ -30,23 +29,27 @@ const ManufacturesCard = ({ manufacture }) => {
         <Card sx={{ maxWidth: 345, height: "100%" }}>
             <CardHeader
                 action={
-                    <IconButton
-                        onClick={deleteClickHandle}
-                        color="error"
-                        aria-label="settings"
-                    >
-                        <DeleteIcon />
-                    </IconButton>
+                    canManage ? (
+                        <IconButton
+                            onClick={deleteClickHandle}
+                            color="error"
+                            aria-label="settings"
+                        >
+                            <DeleteIcon />
+                        </IconButton>
+                    ) : null
                 }
                 title={manufacture.name}
             />
 
             <CardActions disableSpacing>
-                <Link to={`update/${manufacture.id}`}>
-                    <IconButton color="success" aria-label="edit">
-                        <EditIcon />
-                    </IconButton>
-                </Link>
+                {canManage && (
+                    <Link to={`update/${manufacture.id}`}>
+                        <IconButton color="success" aria-label="edit">
+                            <EditIcon />
+                        </IconButton>
+                    </Link>
+                )}
 
                 <Link to={`/cars?manufactureId=${manufacture.id}`}>
                     <Button size="small">Переглянути авто</Button>

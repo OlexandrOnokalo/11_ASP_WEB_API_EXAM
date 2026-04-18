@@ -13,6 +13,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { GoogleIcon, FacecarIcon } from "./../components/CustomIcons";
 import { object, string, ref } from "yup";
 import { useFormik } from "formik";
+import { useAuth } from "../../../context/AuthContext";
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: "flex",
@@ -57,36 +58,30 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 
 const RegisterPage = () => {
     const navigate = useNavigate();
+    const { registerRequest } = useAuth();
 
-    const handleSubmit = (userData) => {
-        let users = [];
-        const localData = localStorage.getItem("users");
-        if(localData) {
-            users = JSON.parse(localData);
-        }
+    const handleSubmit = async (userData) => {
+        const payload = {
+            email: userData.email,
+            userName: userData.userName,
+            password: userData.password,
+            firstName: userData.firstName || null,
+            lastName: userData.lastName || null,
+        };
 
-        if(users.length === 0) {
-            userData.role = "admin"
-        } else {
-            userData.role = "user"
-        }
-
-        const index = users.findIndex(u => u.email === userData.email);
-
-        if(index !== -1) {
-            alert(`Користувач з поштою '${userData.email}' вже існує`);
+        const response = await registerRequest(payload);
+        if (!response.success) {
+            alert(response.message || "Не вдалося виконати реєстрацію");
             return;
         }
 
-        delete userData.confirmPassword;
-        users.push(userData);
-        localStorage.setItem("users", JSON.stringify(users));
         navigate("/login");
     };
 
     const validationSchema = object({
-        firstName: string().required("Обов'язкове поле"),
-        lastName: string().required("Обов'язкове поле"),
+        firstName: string(),
+        lastName: string(),
+        userName: string().required("Обов'язкове поле"),
         email: string()
             .required("Обов'язкове поле")
             .email("Невірний формат пошти"),
@@ -102,6 +97,7 @@ const RegisterPage = () => {
     const initValues = {
         firstName: "",
         lastName: "",
+        userName: "",
         email: "",
         password: "",
         confirmPassword: "",
@@ -177,6 +173,21 @@ const RegisterPage = () => {
                                 onBlur={formik.handleBlur}
                             />
                             {getError("lastName")}
+                        </FormControl>
+                        <FormControl>
+                            <FormLabel htmlFor="userName">Ім'я користувача</FormLabel>
+                            <TextField
+                                type="text"
+                                name="userName"
+                                placeholder="username"
+                                autoComplete="userName"
+                                fullWidth
+                                variant="outlined"
+                                value={formik.values.userName}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                            />
+                            {getError("userName")}
                         </FormControl>
                         <FormControl>
                             <FormLabel htmlFor="email">Пошта</FormLabel>

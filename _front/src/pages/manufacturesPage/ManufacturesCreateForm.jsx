@@ -10,8 +10,9 @@ import { styled } from "@mui/material/styles";
 import { useFormik } from "formik";
 import { object, string } from "yup";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useDispatch } from "react-redux";
+import { api } from "../../api";
+import { getEntity } from "../../services/responseParsers";
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: "flex",
@@ -64,13 +65,11 @@ const ManufacturesCreateForm = () => {
     const navigate = useNavigate();
 
     async function handleSubmit(newmanufacture) {
-        const ManufacturesUrl = import.meta.env.VITE_MANUFACTURES_URL;
-
-        const response = await axios.post(ManufacturesUrl, {
+        const response = await api.post("manufactures", {
             name: newmanufacture.name,
         });
         if (response.status === 200 || response.status === 201) {
-            const createdmanufacture = response.data && response.data.data ? response.data.data : response.data;
+            const createdmanufacture = getEntity(response);
             dispatch({ type: "createmanufacture", payload: createdmanufacture });
             navigate("/Manufactures");
         }

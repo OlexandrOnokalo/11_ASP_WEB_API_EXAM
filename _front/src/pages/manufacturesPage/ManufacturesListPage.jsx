@@ -2,30 +2,28 @@ import ManufacturesCard from "./ManufacturesCard";
 import { Box, Grid, IconButton, CircularProgress } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import { api } from "../../api";
 import { useAuth } from "../../context/AuthContext";
 import { useDispatch, useSelector } from "react-redux";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { getItems } from "../../services/responseParsers";
 
 const ManufacturesListPage = () => {
     const dispatch = useDispatch();
-    const { isAuth, user } = useAuth();
+    const { isAdmin } = useAuth();
 
 
     const { Manufactures, isLoaded } = useSelector((state) => state.manufacture);
 
     async function fetchManufactures() {
-        const ManufacturesUrl = import.meta.env.VITE_MANUFACTURES_URL;
         const pageCount = 150;
         const page = 1;
-        const url = `${ManufacturesUrl}?page_size=${pageCount}&page=${page}`;
 
         if (!isLoaded) {
-            const response = await axios.get(url);
+            const response = await api.get("manufactures", { params: { page_size: pageCount, page } });
             const { data, status } = response;
             if (status === 200) {
-                const ManufacturesData = data.data.items;
-                dispatch({ type: "loadManufactures", payload: ManufacturesData });
+                dispatch({ type: "loadManufactures", payload: getItems(response) });
             } else {
                 console.log("Не вдалося завантажити авторів");
             }
@@ -55,10 +53,10 @@ const ManufacturesListPage = () => {
             <Grid container spacing={2} mx="100px" my="50px">
                 {Manufactures.map((a, index) => (
                     <Grid size={4} key={index}>
-                        <ManufacturesCard manufacture={a} />
+                        <ManufacturesCard manufacture={a} canManage={isAdmin} />
                     </Grid>
                 ))}
-                {isAuth && user.role === "admin" && (
+                {isAdmin && (
                     <Grid size={Manufactures.length % 3 === 0 ? 12 : 4}>
                         <Box
                             width="100%"

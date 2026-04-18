@@ -1,12 +1,13 @@
 import Stack from "@mui/material/Stack";
 import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import { object, number, string } from "yup";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useDispatch } from "react-redux";
+import { api } from "../../api";
+import { getItems } from "../../services/responseParsers";
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: "flex",
@@ -29,33 +30,31 @@ export default function CarCreateForm(){
     const dispatch = useDispatch();
     const [manufactures, setManufactures] = useState([]);
     useEffect(()=> {
-        axios.get(import.meta.env.VITE_MANUFACTURES_URL, { params: { page:1, page_size:200 }}).then(r=>{
-            const data = r.data && r.data.data ? r.data.data : r.data;
-            setManufactures(data.items || data || []);
+        api.get("manufactures", { params: { page:1, page_size:200 }}).then(r=>{
+            setManufactures(getItems(r));
         }).catch(()=>setManufactures([]));
     },[]);
     const formik = useFormik({
-        initialValues: { name:'', manufactureId:0, year:new Date().getFullYear(), volume:1.6, price:0, color:'', description:'', image: '' },
+        initialValues: { name:'', manufactureId:0, year:new Date().getFullYear(), volume:1.6, price:0, color:'', description:'', image: null },
         validationSchema: schema,
         onSubmit: async (values) => {
             try {
-                const response = await axios.post(import.meta.env.VITE_CARS_URL, {
-                    name: values.name,
-                    manufactureId: Number(values.manufactureId),
-                    year: Number(values.year),
-                    volume: Number(values.volume),
-                    price: Number(values.price),
-                    color: values.color,
-                    description: values.description,
-                    image: values.image
-                });
-                const listRes = await axios.get(import.meta.env.VITE_CARS_URL, { params: { page: 1, page_size: 100 } });
-                const data = listRes.data && listRes.data.data ? listRes.data.data : listRes.data;
-                if(data && data.items) {
-                    dispatch({ type: 'loadcars', payload: data.items });
-                } else if(Array.isArray(data)) {
-                    dispatch({ type: 'loadcars', payload: data });
+                const formData = new FormData();
+                formData.append("name", values.name);
+                formData.append("manufactureId", String(Number(values.manufactureId)));
+                formData.append("year", String(Number(values.year)));
+                formData.append("volume", String(Number(values.volume)));
+                formData.append("price", String(Number(values.price)));
+                formData.append("color", values.color);
+                formData.append("description", values.description || "");
+                formData.append("desciption", values.description || "");
+                if (values.image instanceof File) {
+                    formData.append("image", values.image);
                 }
+
+                await api.post("cars", formData);
+                const listRes = await api.get("cars", { params: { page: 1, page_size: 100 } });
+                dispatch({ type: 'loadcars', payload: getItems(listRes) });
                 navigate('/cars');
             } catch(e){
                 console.error(e);
@@ -77,7 +76,12 @@ export default function CarCreateForm(){
                     <input name="price" placeholder="Ціна" value={formik.values.price} onChange={formik.handleChange} />
                     <input name="color" placeholder="Колір" value={formik.values.color} onChange={formik.handleChange} />
                     <input name="description" placeholder="Опис" value={formik.values.description} onChange={formik.handleChange} />
-                    <input name="image" placeholder="URL зображення" value={formik.values.image} onChange={formik.handleChange} />
+                    <input
+                        type="file"
+                        name="image"
+                        accept="image/*"
+                        onChange={(e) => formik.setFieldValue("image", e.target.files?.[0] || null)}
+                    />
                     <button type="submit">Зберегти</button>
                 </Stack>
             </form>

@@ -11,8 +11,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import { object, string } from "yup";
 import { useEffect } from "react";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
+import { api } from "../../api";
+import { getEntity } from "../../services/responseParsers";
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: "flex",
@@ -77,13 +78,12 @@ const ManufacturesUpdateForm = () => {
     }, [Manufactures, id]);
 
     async function handleSubmit(newmanufacture) {
-        const ManufacturesUrl = import.meta.env.VITE_MANUFACTURES_URL;
-        const response = await axios.put(`${ManufacturesUrl}/${newmanufacture.id}`, {
+        const response = await api.put(`manufactures/${newmanufacture.id}`, {
             id: newmanufacture.id,
             name: newmanufacture.name,
         });
         if (response.status === 200) {
-            const updated = response.data && response.data.data ? response.data.data : response.data;
+            const updated = getEntity(response);
             const index = Manufactures.findIndex(a => a.id == newmanufacture.id);
             let newManufactures = [...Manufactures];
             if (index !== -1) newManufactures[index] = updated;
