@@ -52,8 +52,10 @@ namespace Cars.BLL.Services
 
         public async Task<ManufactureItemDto> CreateAsync(CreateManufactureDto dto)
         {
+            // тримлю спочатку, щоб перевіряти унікальність і зберігати вже очищене значення
             string name = dto.Name.Trim();
 
+            // ToLower() в LINQ-to-DB — бо OrdinalIgnoreCase не транслюється в SQL
             bool exists = await _context.Manufactures
                 .AnyAsync(x => x.Name.ToLower() == name.ToLower());
 
@@ -63,6 +65,7 @@ namespace Cars.BLL.Services
             }
 
             var entity = _mapper.Map<ManufactureEntity>(dto);
+            // перезаписую після mapper — хочу зберігати саме тримлене значення
             entity.Name = name;
 
             _context.Manufactures.Add(entity);
@@ -73,6 +76,7 @@ namespace Cars.BLL.Services
 
         public async Task<ManufactureItemDto?> UpdateAsync(int id, UpdateManufactureDto dto)
         {
+            // захист від неузгодженості route id і body id — клієнт може зіслати чужий id у тілі
             if (dto.Id != id)
             {
                 throw new ArgumentException("Route id and body id do not match.");
@@ -86,6 +90,7 @@ namespace Cars.BLL.Services
 
             string name = dto.Name.Trim();
 
+            // x.Id != id — виключаю себе, бо запис може залишити свою ж назву
             bool duplicate = await _context.Manufactures
                 .AnyAsync(x => x.Id != id && x.Name.ToLower() == name.ToLower());
 
@@ -95,6 +100,7 @@ namespace Cars.BLL.Services
             }
 
             _mapper.Map(dto, entity);
+            // перезаписую після mapper — так само як в Create, щоб зберігти тримлене значення
             entity.Name = name;
 
             await _context.SaveChangesAsync();
@@ -110,6 +116,8 @@ namespace Cars.BLL.Services
                 return false;
             }
 
+            // FK в БД налаштований як Restrict — без цього if БД поверне незрозуміле виняток;
+            // перевіряю сам, щоб дати зрозуміле повідомлення
             bool hasCars = await _context.Cars.AnyAsync(x => x.ManufactureId == id);
             if (hasCars)
             {

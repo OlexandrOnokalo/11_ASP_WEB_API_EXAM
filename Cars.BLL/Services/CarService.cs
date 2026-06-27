@@ -9,6 +9,7 @@ namespace Cars.BLL.Services
 {
     public class CarService
     {
+        // дефолтні URL — передаю ці рядки в ImageService як захищені, щоб фізичні файли ніколи не видалялись
         private const string ToyotaDefaultImage = "/images/cars/Toyota-logo.jpg";
         private const string BmwDefaultImage = "/images/cars/BMW-logo.png";
         private const string AudiDefaultImage = "/images/cars/audi-logo.png";
@@ -29,8 +30,10 @@ namespace Cars.BLL.Services
         {
             int page = queryDto.Page;
             int pageSize = queryDto.PageSize;
+            // не довіряю вхідним значенням — клієнт може передати 0 або негатив
             NormalizePaging(ref page, ref pageSize);
 
+            // AsNoTracking — тільки читання, трекінг EF тут ні до чого
             var query = _context.Cars
                 .AsNoTracking()
                 .Include(x => x.Manufacture)
@@ -38,6 +41,7 @@ namespace Cars.BLL.Services
 
             query = ApplyFilter(query, queryDto.Property, queryDto.Value);
 
+            // підраховую раз до Skip/Take, бо після дасть неправильний результат
             var totalCount = await query.CountAsync();
 
             var entities = await query
@@ -66,6 +70,7 @@ namespace Cars.BLL.Services
             decimal min = queryDto.MinValue;
             decimal max = queryDto.MaxValue;
 
+            // якщо клієнт переплутав порядок — коригую сам, а не падаю помилку
             if (min > max)
             {
                 (min, max) = (max, min);
@@ -117,6 +122,7 @@ namespace Cars.BLL.Services
             entity.Name = dto.Name.Trim();
             entity.Color = dto.Color.Trim();
             entity.Description = (dto.Description ?? dto.Desciption)?.Trim();
+            // спочатку дефолтне по бренду, і лише якщо є файл — перезаписую
             entity.Image = await GetDefaultImageByManufactureIdAsync(dto.ManufactureId);
 
             if (dto.Image != null)
@@ -127,6 +133,7 @@ namespace Cars.BLL.Services
             _context.Cars.Add(entity);
             await _context.SaveChangesAsync();
 
+            // повертаю через GetByIdAsync, бо там Include(Manufacture) і повний DTO з виробником
             return (await GetByIdAsync(entity.Id))!;
         }
 
@@ -144,8 +151,10 @@ namespace Cars.BLL.Services
                 throw new ArgumentException("Manufacture does not exist.");
             }
 
+            // зберігаю до маппінгу, бо після Map() entity.Image буде незмінним (Ignore()), але потрібнен для видалення старого
             string? oldImage = entity.Image;
 
+            // маппінг в існуючу entity — Id і Image не торкаються (Ignore() в профілі)
             _mapper.Map(dto, entity);
 
             entity.Name = dto.Name.Trim();
@@ -154,11 +163,13 @@ namespace Cars.BLL.Services
 
             if (dto.Image != null)
             {
+                // видаляю старий файл перед збереженням нового — дефолтні файли захищені всередині ImageService
                 _imageService.DeleteIfExists(oldImage, imagesPath, ToyotaDefaultImage, BmwDefaultImage, AudiDefaultImage);
                 entity.Image = await _imageService.SaveAsync(dto.Image, imagesPath, CarsImagesUrl);
             }
             else if (IsDefaultImage(oldImage))
             {
+                // файл не завантажили, але виробник міг змінитись — оновлюю дефолтне зображення під новий бренд
                 entity.Image = await GetDefaultImageByManufactureIdAsync(dto.ManufactureId);
             }
 
@@ -175,6 +186,7 @@ namespace Cars.BLL.Services
                 return false;
             }
 
+            // видаляю фізичний файл до Remove, щоб не залишати сироту на диску
             _imageService.DeleteIfExists(entity.Image, imagesPath, ToyotaDefaultImage, BmwDefaultImage, AudiDefaultImage);
 
             _context.Cars.Remove(entity);
@@ -184,6 +196,7 @@ namespace Cars.BLL.Services
 
         private async Task<string> GetDefaultImageByManufactureIdAsync(int manufactureId)
         {
+            // тягну тільки Name, бо вся entity заради одного поля — зайво багато
             string? name = await _context.Manufactures
                 .AsNoTracking()
                 .Where(x => x.Id == manufactureId)
@@ -200,6 +213,7 @@ namespace Cars.BLL.Services
                 "toyota" => ToyotaDefaultImage,
                 "bmw" => BmwDefaultImage,
                 "audi" => AudiDefaultImage,
+                // невідомий бренд — фолбек на Toyota, не null
                 _ => ToyotaDefaultImage
             };
         }
@@ -225,6 +239,7 @@ namespace Cars.BLL.Services
             {
                 "name" => query.Where(x => x.Name.ToLower().Contains(v.ToLower())),
                 "manufacture" => query.Where(x => x.Manufacture != null && x.Manufacture.Name.ToLower().Contains(v.ToLower())),
+                // якщо значення не парситься — повертаю порожній список, а не ігнорую фільтр
                 "year" => int.TryParse(v, out int year) ? query.Where(x => x.Year == year) : query.Where(_ => false),
                 "color" => query.Where(x => x.Color.ToLower().Contains(v.ToLower())),
                 "volume" => decimal.TryParse(v, out decimal volume) ? query.Where(x => x.Volume == volume) : query.Where(_ => false),
@@ -232,6 +247,7 @@ namespace Cars.BLL.Services
             };
         }
 
+        // захищаю від некоректних значень; pageSize > 500 — верхня межа щоб не вантажити забагато записів з БД
         private static void NormalizePaging(ref int page, ref int pageSize)
         {
             if (page < 1) page = 1;

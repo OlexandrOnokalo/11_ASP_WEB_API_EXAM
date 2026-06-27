@@ -20,7 +20,7 @@ using JwtSettings = Cars.BLL.Settings.JwtSettings;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Serilog
+// Serilog підключаю першим — щоб навіть помилки старту програми потрапили в лог
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
@@ -38,6 +38,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 // Add identity
+// Свідомо послабив вимоги до пароля — це навчальний проєкт, не продакшн;
+// у реальному додатку RequireUppercase/RequireDigit варто вмикати
 builder.Services.AddIdentity<AppUserEntity, AppRoleEntity>(options =>
 {
     options.User.RequireUniqueEmail = true;
@@ -56,6 +58,8 @@ builder.Services.AddIdentity<AppUserEntity, AppRoleEntity>(options =>
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
 // Quartz (щотижня у неділю о 00:00)
+// WaitForJobsToComplete = true — щоб при зупинці сервера Quartz дочекався завершення джобу,
+// а не обрізав DELETE посередині
 builder.Services.AddJobs(
     (typeof(RefreshTokensCleanupJob), "0 0 0 ? * SUN")
 );
@@ -77,6 +81,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 
 // Validation response format
+// Перевизначаю стандартну відповідь 400 від ASP.NET — хочу отримувати
+// свій ErrorResponseDto з полем errors замість дефолтного ProblemDetails
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.InvalidModelStateResponseFactory = context =>
@@ -153,9 +159,12 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // Static files for cars images
+// Маплю фізичну папку Storage/Cars/ на URL-префікс /images/cars —
+// так фронт може брати зображення напряму без контролера
 string storagePath = Path.Combine(app.Environment.ContentRootPath, StaticFilesSettings.StorageDir, StaticFilesSettings.CarsDir);
 if (!Directory.Exists(storagePath))
 {
+    // Папка може не існувати при першому запуску — створюю щоб UseStaticFiles не впав
     Directory.CreateDirectory(storagePath);
 }
 app.UseStaticFiles(new StaticFileOptions
@@ -169,12 +178,17 @@ app.UseCors(corsPolicyName);
 app.UseAuthentication();
 app.UseAuthorization();
 
+// ExceptionMiddleware іде після auth — щоб помилки авторизації теж
+// перехоплювались і поверталися у форматі ErrorResponseDto
 app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapControllers();
 
+// Сідер запускаю після app.Build() але до app.Run() —
+// міграції та дефолтні дані мають бути в БД до першого реального запиту
 await Seeder.SeedAsync(app.Services);
 
 app.Run();
 
+// Явний flush — гарантую що останні логи запишуться при завершенні процесу
 Log.CloseAndFlush();

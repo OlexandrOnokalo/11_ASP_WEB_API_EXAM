@@ -10,6 +10,8 @@ namespace Cars.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly AuthService _authService;
+        // JwtService є окремо — refresh це операція над токеном, а не бізнес-логіка усера;
+        // вирішив не мішати це в AuthService
         private readonly JwtService _jwtService;
 
         public AuthController(AuthService authService, JwtService jwtService)
@@ -32,6 +34,8 @@ namespace Cars.API.Controllers
             return Ok(new ApiResponseDto<AuthResultDto> { Data = result });
         }
 
+        // Refresh іде через JwtService — перевіряє чи токен не протермінований і не використаний,
+        // потім видає нову пару access+refresh — одноразове використання (rotation)
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshAsync([FromBody] RefreshTokenRequestDto dto)
         {
@@ -39,6 +43,8 @@ namespace Cars.API.Controllers
             return Ok(new ApiResponseDto<JwtDto> { Data = result });
         }
 
+        // GET з querystring — бо посилання підтвердження приходить лінком у листі;
+        // userId та token це параметри URL, а не тіло запиту
         [HttpGet("confirm-email")]
         public async Task<IActionResult> ConfirmEmailAsync([FromQuery] string userId, [FromQuery] string token)
         {

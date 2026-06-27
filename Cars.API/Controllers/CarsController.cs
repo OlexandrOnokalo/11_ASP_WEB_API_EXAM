@@ -19,11 +19,14 @@ namespace Cars.API.Controllers
         {
             _carService = carService;
 
+            // Рахую фізичний шлях один раз у конструкторі, щоб не робити Path.Combine на кожному запиті
             string rootPath = environment.ContentRootPath;
             _carsPath = Path.Combine(rootPath, StaticFilesSettings.StorageDir, StaticFilesSettings.CarsDir);
+            // Створюю папку якщо немає — наприклад при чистому репозиторії без Storage/
             Directory.CreateDirectory(_carsPath);
         }
 
+        // GET без [Authorize] — перегляд каталогу доступний всім, реєстрація не потрібна
         [HttpGet]
         public async Task<IActionResult> GetAsync(
             [FromQuery] int page = 1,
@@ -79,6 +82,7 @@ namespace Cars.API.Controllers
         public async Task<IActionResult> CreateAsync([FromForm] CreateCarDto dto)
         {
             var created = await _carService.CreateAsync(dto, _carsPath);
+            // CreatedAtRoute повертає 201 + Location header — клієнт знає куди робити GET нового авто
             return CreatedAtRoute("GetCarById", new { id = created.Id }, new ApiResponseDto<CarItemDto> { Data = created });
         }
 
@@ -99,6 +103,7 @@ namespace Cars.API.Controllers
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
+            // false — авто не знайшло (BLL не кидає виняток в цьому кейсі)
             bool deleted = await _carService.DeleteAsync(id, _carsPath);
             if (!deleted)
             {

@@ -20,8 +20,10 @@ namespace Cars.BLL.Services
             _jwtService = jwtService;
         }
 
+        // вхідна точка реєстрації: перевіряю унікальність, створюю юзера, видаю токен для підтвердження email
         public async Task<RegisterResultDto> RegisterAsync(RegisterDto dto)
         {
+            // перевіряю email і username окремо, щоб дати точне повідомлення що саме зайняте
             if (await _userManager.FindByEmailAsync(dto.Email) != null)
             {
                 throw new InvalidOperationException($"Пошта '{dto.Email}' вже використовується.");
@@ -40,12 +42,14 @@ namespace Cars.BLL.Services
                 LastName = dto.LastName
             };
 
+            // Identity сам хешує пароль — передаю сирий рядок, назовні він не зберігається
             var createResult = await _userManager.CreateAsync(user, dto.Password);
             if (!createResult.Succeeded)
             {
                 throw new InvalidOperationException(createResult.Errors.First().Description);
             }
 
+            // резерв на випадок якщо сидер не відпрацював — роль "user" має бути, але підстрахуюсь
             if (!await _roleManager.RoleExistsAsync("user"))
             {
                 await _roleManager.CreateAsync(new AppRoleEntity { Name = "user" });
@@ -53,6 +57,7 @@ namespace Cars.BLL.Services
 
             await _userManager.AddToRoleAsync(user, "user");
 
+            // токен підтвердження може містити +, /, = — кодую, бо він піде в URL-параметр
             string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             string encodedToken = Uri.EscapeDataString(token);
 
@@ -64,20 +69,24 @@ namespace Cars.BLL.Services
             };
         }
 
+        // вхідна точка логіну: знаходжу юзера, перевіряю пароль, делегую генерацію токенів у JwtService
         public async Task<AuthResultDto> LoginAsync(LoginDto dto)
         {
+            // шукаю по email, бо username не завжди знають — так зручніше
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
             {
                 throw new InvalidOperationException($"Користувач з поштою '{dto.Email}' не існує.");
             }
 
+            // Identity порівнює хеш сам — не торкаюсь паролю напряму
             bool passwordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
             if (!passwordValid)
             {
                 throw new InvalidOperationException("Пароль вказано невірно.");
             }
 
+            // роли потрібні і для claims у токені, і для відповіді клієнту — тягну окремо
             var tokens = await _jwtService.GenerateTokensAsync(user);
             var roles = await _userManager.GetRolesAsync(user);
 
@@ -94,6 +103,7 @@ namespace Cars.BLL.Services
             };
         }
 
+        // підтвердження email: розкодовую токен з URL і передаю Identity — він сам ставить EmailConfirmed = true
         public async Task ConfirmEmailAsync(string userId, string token)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -102,6 +112,7 @@ namespace Cars.BLL.Services
                 throw new InvalidOperationException("Користувача не знайдено.");
             }
 
+            // токен прийшов URL-encoded з query string — розкодовую назад перед передачею в Identity
             string decodedToken = Uri.UnescapeDataString(token);
             var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
 

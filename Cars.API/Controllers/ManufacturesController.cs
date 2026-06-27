@@ -18,6 +18,7 @@ namespace Cars.API.Controllers
             _manufactureService = manufactureService;
         }
 
+        // GET без [Authorize] — список виробників публічний, бо фронт показує їх в дропдауні при створенні авто
         [HttpGet]
         public async Task<IActionResult> GetAsync([FromQuery] int page = 1, [FromQuery(Name = "page_size")] int pageSize = 100)
         {
@@ -42,6 +43,7 @@ namespace Cars.API.Controllers
         public async Task<IActionResult> CreateAsync([FromBody] CreateManufactureDto dto)
         {
             var created = await _manufactureService.CreateAsync(dto);
+            // 201 + Location header, аналогічно CarsController
             return CreatedAtRoute("GetManufactureById", new { id = created.Id }, new ApiResponseDto<ManufactureItemDto> { Data = created });
         }
 
@@ -62,6 +64,8 @@ namespace Cars.API.Controllers
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
+            // false може бути і через неіснуючий id, і через каскадне блокування —
+            // BLL кидає ArgumentException якщо виробник має пов'язані авто, а middleware перехопить це в 400
             bool deleted = await _manufactureService.DeleteAsync(id);
             if (!deleted)
             {
