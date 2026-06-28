@@ -20,24 +20,27 @@ using JwtSettings = Cars.BLL.Settings.JwtSettings;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Serilog
+// Ініціалізую Serilog до build'у host'а — щоб будь-яке падіння при старті теж потрапило в лог
 Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
+    .ReadFrom.Configuration(builder.Configuration) // sink'и і рівні логування беру з appsettings.json
     .CreateLogger();
 
+// Підмінюю Microsoft.Extensions.Logging на Serilog для всього host'а
 builder.Host.UseSerilog();
 
-// Add dbcontext
+// AppDbContext — Scoped за замовчуванням; всі сервіси що його використовують теж мусять бути Scoped
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     string? connectionString = builder.Configuration.GetConnectionString("LocalDb");
     options.UseNpgsql(connectionString);
 });
 
-// Settings
+// Прив'язую POCO JwtSettings до секції конфігу — щоб IOptions<JwtSettings> працював у JwtService
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
-// Add identity
+// RequireUniqueEmail — логін іде через email, дублікати зламають FindByEmailAsync
+// Правила пароля навмисно послаблені — навчальний проект, зручніше тестувати
+// AddDefaultTokenProviders — без нього UserManager не згенерує токен для підтвердження email
 builder.Services.AddIdentity<AppUserEntity, AppRoleEntity>(options =>
 {
     options.User.RequireUniqueEmail = true;
@@ -52,16 +55,17 @@ builder.Services.AddIdentity<AppUserEntity, AppRoleEntity>(options =>
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-// Add authentication
+// Деталі JWT-валідації (Issuer, Audience, ClockSkew=0) — у DependencyInjectionExtensions.cs
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
-// Quartz (щотижня у неділю о 00:00)
+// Щотижня у неділю о 00:00 UTC — чищу протерміновані refresh-токени старші за 7 днів
 builder.Services.AddJobs(
     (typeof(RefreshTokensCleanupJob), "0 0 0 ? * SUN")
 );
+// WaitForJobsToComplete — щоб при shutdown сервер дочекався завершення DELETE перед зупинкою
 builder.Services.AddQuartzHostedService(cfg => cfg.WaitForJobsToComplete = true);
 
-// CORS
+// Дозволяю тільки Vite dev server на 5173 — в продакшені потрібно замінити на реальний домен
 const string corsPolicyName = "allowAll";
 builder.Services.AddCors(options =>
 {
@@ -73,10 +77,9 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Add services to the container.
 builder.Services.AddControllers();
 
-// Validation response format
+// Перезаписую дефолтний формат помилок валідації — хочу свій ErrorResponseDto, а не стандартний ProblemDetails
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.InvalidModelStateResponseFactory = context =>
@@ -100,7 +103,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     };
 });
 
-// OpenAPI/Swagger
+// AddSecurityRequirement — щоб кнопка "Authorize" у Swagger UI діяла глобально для всіх ендпоінтів
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -129,20 +132,20 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// Repositories
+// Всі Scoped — AppDbContext (EF Core) теж Scoped; Singleton + DbContext = exception у runtime
 builder.Services.AddScoped<RefreshTokenRepository>();
 
-// Services
 builder.Services.AddScoped<ManufactureService>();
 builder.Services.AddScoped<CarService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<ImageService>();
+// Передаю assembly де CarMapperProfile — AutoMapper сам знайде і ManufactureMapperProfile у тому ж assembly
 builder.Services.AddAutoMapper(cfg => { }, typeof(CarMapperProfile).Assembly);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Swagger тільки в Development — не хочу відкривати схему API назовні в продакшені
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -152,7 +155,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Static files for cars images
+// Маплю фізичний Storage/Cars/ на URL /images/cars/ — звідти віддаються фото авто
+// Папку створюю сам, бо git не трекає порожні директорії — на свіжому clone її не буде
 string storagePath = Path.Combine(app.Environment.ContentRootPath, StaticFilesSettings.StorageDir, StaticFilesSettings.CarsDir);
 if (!Directory.Exists(storagePath))
 {
@@ -164,17 +168,22 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = StaticFilesSettings.CarsUrl
 });
 
+// CORS перед Authentication — браузер відправляє preflight OPTIONS до автентифікації
 app.UseCors(corsPolicyName);
 
+// Authentication → Authorization — порядок критичний, інакше [Authorize] не бачить user'а
 app.UseAuthentication();
 app.UseAuthorization();
 
+// ExceptionMiddleware після Auth — ловить бізнес-виключення з сервісів і перетворює на ErrorResponseDto
 app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapControllers();
 
+// Запускаю після Build() але до Run() — міграції і seed виконуються до першого HTTP-запиту
 await Seeder.SeedAsync(app.Services);
 
 app.Run();
 
+// Флашу буфер Serilog після зупинки — щоб останні логи не загубились у пам'яті
 Log.CloseAndFlush();

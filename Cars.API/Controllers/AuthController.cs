@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Cars.API.Controllers
 {
+    // Всі ендпоінти анонімні — [Authorize] немає, бо авторизованому юзеру нема сенсу логінитись чи реєструватись
     [ApiController]
     [Route("api/auth")]
     public class AuthController : ControllerBase
@@ -12,12 +13,15 @@ namespace Cars.API.Controllers
         private readonly AuthService _authService;
         private readonly JwtService _jwtService;
 
+        // AuthService — робота з Identity (юзери, ролі, email)
+        // JwtService — чисто токени: генерація і оновлення; розділив бо Identity-логіка не залежить від JWT
         public AuthController(AuthService authService, JwtService jwtService)
         {
             _authService = authService;
             _jwtService = jwtService;
         }
 
+        // Повертає confirmation token, а не JWT — юзер повинен спочатку підтвердити email
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterDto dto)
         {
@@ -25,6 +29,7 @@ namespace Cars.API.Controllers
             return Ok(new ApiResponseDto<RegisterResultDto> { Data = result });
         }
 
+        // Повертає AuthResultDto: одразу і токени (access+refresh), і дані юзера — щоб фронт не робив другий запит
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginDto dto)
         {
@@ -32,6 +37,7 @@ namespace Cars.API.Controllers
             return Ok(new ApiResponseDto<AuthResultDto> { Data = result });
         }
 
+        // Тут викликаю _jwtService, а не _authService — refresh це чисто JWT-операція, Identity тут не нужна
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshAsync([FromBody] RefreshTokenRequestDto dto)
         {
@@ -39,6 +45,7 @@ namespace Cars.API.Controllers
             return Ok(new ApiResponseDto<JwtDto> { Data = result });
         }
 
+        // GET — бо посилання відкривається прямо з браузера, всі параметри в URL; токен у URL — URL-decode робить AuthService
         [HttpGet("confirm-email")]
         public async Task<IActionResult> ConfirmEmailAsync([FromQuery] string userId, [FromQuery] string token)
         {

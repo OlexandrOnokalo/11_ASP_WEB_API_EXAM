@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Cars.BLL.Services
 {
+    // CRUD для виробників — захист від дублікатів і від осиротілих видалень.
+    // На відміну від CarService фільтрації немає — виробників небагато.
     public class ManufactureService
     {
         private readonly AppDbContext _context;
@@ -50,6 +52,7 @@ namespace Cars.BLL.Services
             return entity == null ? null : _mapper.Map<ManufactureItemDto>(entity);
         }
 
+        // Перевіряю унікальність case-insensitive — "Toyota" і "toyota" мають бути одним брендом
         public async Task<ManufactureItemDto> CreateAsync(CreateManufactureDto dto)
         {
             string name = dto.Name.Trim();
@@ -73,6 +76,7 @@ namespace Cars.BLL.Services
 
         public async Task<ManufactureItemDto?> UpdateAsync(int id, UpdateManufactureDto dto)
         {
+            // Додаткова санітація: id з route і з body мають збігатися, інакше PUT на одну, а оновлює іншу
             if (dto.Id != id)
             {
                 throw new ArgumentException("Route id and body id do not match.");
@@ -86,6 +90,7 @@ namespace Cars.BLL.Services
 
             string name = dto.Name.Trim();
 
+            // x.Id != id — виключаю себе з перевірки, бо інакше rename на те саме ім'я завжди кидаю помилку
             bool duplicate = await _context.Manufactures
                 .AnyAsync(x => x.Id != id && x.Name.ToLower() == name.ToLower());
 
@@ -102,6 +107,8 @@ namespace Cars.BLL.Services
             return _mapper.Map<ManufactureItemDto>(entity);
         }
 
+        // Забороняю видалення якщо є авто — FK без cascade delete,
+        // краще помилка ніж осиротіла DB constraint.
         public async Task<bool> DeleteAsync(int id)
         {
             var entity = await _context.Manufactures.FirstOrDefaultAsync(x => x.Id == id);
@@ -121,6 +128,7 @@ namespace Cars.BLL.Services
             return true;
         }
 
+        // Той самий захист від некоректної пагінації що і в CarService
         private static void NormalizePaging(ref int page, ref int pageSize)
         {
             if (page < 1) page = 1;

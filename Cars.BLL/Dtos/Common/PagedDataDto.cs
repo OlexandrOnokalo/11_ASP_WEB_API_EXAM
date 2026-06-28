@@ -1,5 +1,6 @@
 namespace Cars.BLL.Dtos.Common
 {
+    // DTO — стандартна структура для всіх пагінованих списків; TotalCount нужний фронту для розрахунку кількості сторінок.
     public class PagedDataDto<T>
     {
         public List<T> Items { get; set; } = [];

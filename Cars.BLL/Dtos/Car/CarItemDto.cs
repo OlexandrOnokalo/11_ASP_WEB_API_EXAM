@@ -1,5 +1,6 @@
 namespace Cars.BLL.Dtos.Car
 {
+    // DTO — відповідь на GET: повні дані авто + вкладений об'єкт виробника.
     public class CarItemDto
     {
         public int Id { get; set; }
@@ -12,6 +13,7 @@ namespace Cars.BLL.Dtos.Car
         public string? Description { get; set; }
         public string? Image { get; set; }
 
+        // null якщо запит без Include — в сервісі завжди роблю Include
         public CarManufactureDto? Manufacture { get; set; }
     }
 }

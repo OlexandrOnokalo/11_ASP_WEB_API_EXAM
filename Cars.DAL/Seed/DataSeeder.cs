@@ -5,12 +5,14 @@ namespace Cars.DAL.Seed
 {
     public static class DataSeeder
     {
+        // Дефолтні URL зображень — файли лежать у Storage/Cars/, маплю через UseStaticFiles у Program.cs
         private const string ToyotaImage = "/images/cars/Toyota-logo.jpg";
         private const string BmwImage = "/images/cars/BMW-logo.png";
         private const string AudiImage = "/images/cars/audi-logo.png";
 
         public static async Task SeedAsync(AppDbContext context)
         {
+            // Ідемпотентна перевірка — якщо хоч щось є, не чіпаю; захист від повторного запуску
             if (await context.Manufactures.AnyAsync() || await context.Cars.AnyAsync())
             {
                 return;
@@ -20,6 +22,7 @@ namespace Cars.DAL.Seed
             var bmw = new ManufactureEntity { Name = "BMW" };
             var audi = new ManufactureEntity { Name = "Audi" };
 
+            // Зберігаю виробників першими — потрібні їх Id для FK у машинах
             await context.Manufactures.AddRangeAsync(toyota, bmw, audi);
             await context.SaveChangesAsync();
 
@@ -28,6 +31,7 @@ namespace Cars.DAL.Seed
             cars.AddRange(CreateBmwCars(bmw.Id));
             cars.AddRange(CreateAudiCars(audi.Id));
 
+            // 30 машин одним батчем — не хочу 30 окремих SaveChanges
             await context.Cars.AddRangeAsync(cars);
             await context.SaveChangesAsync();
         }

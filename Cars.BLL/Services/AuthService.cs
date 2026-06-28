@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Cars.BLL.Services
 {
+    // Вся бізнес-логіка реєстрації, входу і підтвердження email — тут.
+    // Identity робить важку роботу (хешування, збереження), я тільки оркеструю.
     public class AuthService
     {
         private readonly UserManager<AppUserEntity> _userManager;
@@ -20,8 +22,11 @@ namespace Cars.BLL.Services
             _jwtService = jwtService;
         }
 
+        // Точка входу реєстрації — перевіряю унікальність окремо, бо Identity кидає загальну помилку
+        // без вказівки що саме зайнято (email чи username).
         public async Task<RegisterResultDto> RegisterAsync(RegisterDto dto)
         {
+            // Перевіряю email і username окремо, щоб дати юзеру точне повідомлення про помилку
             if (await _userManager.FindByEmailAsync(dto.Email) != null)
             {
                 throw new InvalidOperationException($"Пошта '{dto.Email}' вже використовується.");
@@ -46,6 +51,8 @@ namespace Cars.BLL.Services
                 throw new InvalidOperationException(createResult.Errors.First().Description);
             }
 
+            // Роль "user" сіється через Seeder, але на випадок якщо сідер не відпрацював —
+            // створюю на льоту, щоб реєстрація не впала.
             if (!await _roleManager.RoleExistsAsync("user"))
             {
                 await _roleManager.CreateAsync(new AppRoleEntity { Name = "user" });
@@ -53,6 +60,7 @@ namespace Cars.BLL.Services
 
             await _userManager.AddToRoleAsync(user, "user");
 
+            // Identity генерує токен з '+', '/' — URL-кодую, бо він піде як query-параметр
             string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             string encodedToken = Uri.EscapeDataString(token);
 
@@ -64,6 +72,7 @@ namespace Cars.BLL.Services
             };
         }
 
+        // Точка входу логіну — шукаю за email (не username), бо так вирішив у RegisterDto.
         public async Task<AuthResultDto> LoginAsync(LoginDto dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
@@ -78,6 +87,7 @@ namespace Cars.BLL.Services
                 throw new InvalidOperationException("Пароль вказано невірно.");
             }
 
+            // Генерацію токенів делегую JwtService — він же зберігає refresh у БД
             var tokens = await _jwtService.GenerateTokensAsync(user);
             var roles = await _userManager.GetRolesAsync(user);
 
@@ -94,6 +104,7 @@ namespace Cars.BLL.Services
             };
         }
 
+        // Зворотній бік RegisterAsync — декодую токен, бо при реєстрації я його закодував
         public async Task ConfirmEmailAsync(string userId, string token)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -102,6 +113,7 @@ namespace Cars.BLL.Services
                 throw new InvalidOperationException("Користувача не знайдено.");
             }
 
+            // Розкодовую URL-encoding, що зробив при генерації токена в RegisterAsync
             string decodedToken = Uri.UnescapeDataString(token);
             var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
 

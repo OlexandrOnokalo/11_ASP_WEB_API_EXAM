@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Cars.BLL.Dtos.Car
 {
+    // DTO — вхід POST [FromForm]: є IFormFile, тому multipart/form-data, не JSON.
     public class CreateCarDto
     {
         [Required]
@@ -30,7 +31,7 @@ namespace Cars.BLL.Dtos.Car
 
         public string? Description { get; set; }
 
-        // Тимчасова сумісність з фронтом (описка у полі)
+        // Тримаю обидва поля: фронт надсилає Desciption (опечатка), видаляти не можу — зламаю клієнта
         public string? Desciption { get; set; }
 
         public IFormFile? Image { get; set; }

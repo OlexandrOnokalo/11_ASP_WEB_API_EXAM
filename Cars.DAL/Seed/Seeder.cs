@@ -7,22 +7,27 @@ namespace Cars.DAL.Seed
 {
     public static class Seeder
     {
+        // Оркестратор запуску — викликається один раз при старті з Program.cs
         public static async Task SeedAsync(IServiceProvider serviceProvider)
         {
+            // Scope потрібен бо Seeder статичний, а DbContext — Scoped-сервіс
             using var scope = serviceProvider.CreateScope();
 
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<AppRoleEntity>>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUserEntity>>();
 
+            // Застосовую всі незастосовані міграції перед сидінням — БД має бути актуальна
             await context.Database.MigrateAsync();
 
             await SeedRolesAsync(roleManager);
             await SeedUsersAsync(userManager);
 
+            // Дані авто та виробників — в окремому класі, щоб не захламляти цей файл
             await DataSeeder.SeedAsync(context);
         }
 
+        // Ідемпотентно — перевіряю наявність перед створенням, можна запускати повторно
         private static async Task SeedRolesAsync(RoleManager<AppRoleEntity> roleManager)
         {
             if (!await roleManager.RoleExistsAsync("admin"))
@@ -38,6 +43,7 @@ namespace Cars.DAL.Seed
 
         private static async Task SeedUsersAsync(UserManager<AppUserEntity> userManager)
         {
+            // Шукаю за email — якщо вже є, пропускаю; якщо ні — створюю з роллю
             var admin = await userManager.FindByEmailAsync("admin@mail.com");
             if (admin == null)
             {
@@ -45,6 +51,7 @@ namespace Cars.DAL.Seed
                 {
                     UserName = "admin",
                     Email = "admin@mail.com",
+                    // EmailConfirmed=true одразу — адмін не проходить email-підтвердження
                     EmailConfirmed = true,
                     FirstName = "Admin",
                     LastName = "Cars"

@@ -1,5 +1,6 @@
 namespace Cars.BLL.Dtos.Car
 {
+    // DTO — параметри GET /by-price; min/max можна переплутати — CarService поміняє сам.
     public class GetCarsByPriceQueryDto
     {
         public decimal MinValue { get; set; }

@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Cars.BLL.Dtos.Auth
 {
+    // DTO — дані для реєстрації; FirstName/LastName необов'язкові — можна зареєструватись без них.
     public class RegisterDto
     {
         [Required]

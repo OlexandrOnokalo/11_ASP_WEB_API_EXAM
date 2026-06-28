@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Cars.BLL.Dtos.Auth
 {
+    // DTO — тіло запиту POST /api/auth/refresh.
     public class RefreshTokenRequestDto
     {
         [Required]

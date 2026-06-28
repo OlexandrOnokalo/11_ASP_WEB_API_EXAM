@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Cars.API.Controllers
 {
+    // Аналог CarsController: GET публічні, write тільки admin; без файлів — усе через JSON
     [ApiController]
     [Route("api/manufactures")]
     public class ManufacturesController : ControllerBase
@@ -25,6 +26,7 @@ namespace Cars.API.Controllers
             return Ok(new ApiResponseDto<PagedDataDto<ManufactureItemDto>> { Data = result });
         }
 
+        // Name = "GetManufactureById" — ім'я маршруту для CreatedAtRoute в CreateAsync
         [HttpGet("{id:int}", Name = "GetManufactureById")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
@@ -37,6 +39,7 @@ namespace Cars.API.Controllers
             return Ok(new ApiResponseDto<ManufactureItemDto> { Data = result });
         }
 
+        // [FromBody] а не [FromForm] — виробник не має зображення, тільки ім'я; унікальність перевіряє сервіс
         [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> CreateAsync([FromBody] CreateManufactureDto dto)
@@ -58,6 +61,8 @@ namespace Cars.API.Controllers
             return Ok(new ApiResponseDto<ManufactureItemDto> { Data = updated });
         }
 
+        // false → 404 (виробника нема)
+        // якщо є прив'язані авто — сервіс кидає ArgumentException → middleware → 400; тобто два різних сценарії помилки
         [Authorize(Roles = "admin")]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteAsync(int id)

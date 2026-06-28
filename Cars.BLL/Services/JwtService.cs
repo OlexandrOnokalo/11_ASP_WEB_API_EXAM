@@ -13,6 +13,8 @@ using System.Text;
 
 namespace Cars.BLL.Services
 {
+    // Stateless-аутентифікація: видаю пару access+refresh і вмію їх оновити.
+    // Refresh зберігаю в БД, бо інакше не можу його інвалідувати до закінчення TTL.
     public class JwtService
     {
         private readonly JwtSettings _jwtSettings;
@@ -29,12 +31,15 @@ namespace Cars.BLL.Services
             _refreshTokenRepository = refreshTokenRepository;
         }
 
+        // Вхідна точка після успішного логіну/рефрешу — видаю обидва токени разом.
+        // ExpiresAtUtc дублюю в DTO, щоб фронт знав коли прийти за рефрешем без декодингу JWT.
         public async Task<JwtDto> GenerateTokensAsync(AppUserEntity user)
         {
             string accessToken = await GenerateAccessTokenAsync(user);
             RefreshTokenEntity refreshToken = GenerateRefreshToken();
             refreshToken.UserId = user.Id;
 
+            // Зберігаю refresh у БД — тільки так потім можу перевірити чи він вже використаний
             await _refreshTokenRepository.CreateAsync(refreshToken);
 
             return new JwtDto
@@ -45,27 +50,34 @@ namespace Cars.BLL.Services
             };
         }
 
+        // Оновлення пари токенів — тут три причини відмови за однією помилкою навмисно:
+        // не хочу підказувати атакуючому яка саме перевірка провалилась.
         public async Task<JwtDto> RefreshAsync(string refreshToken)
         {
             var oldToken = await _refreshTokenRepository.GetByTokenAsync(refreshToken);
 
+            // Перевіряю: існує, не прострочений, не використаний — одноразовий токен
             if (oldToken == null || oldToken.IsExpired || oldToken.IsUsed)
             {
                 throw new InvalidOperationException("Refresh token недійсний.");
             }
 
+            // Юзер теоретично міг бути видалений після видачі токена
             var user = await _userManager.FindByIdAsync(oldToken.UserId);
             if (user == null)
             {
                 throw new InvalidOperationException("Refresh token недійсний.");
             }
 
+            // Позначаю як використаний до генерації нового — захист від race condition
             oldToken.IsUsed = true;
             await _refreshTokenRepository.UpdateAsync(oldToken);
 
             return await GenerateTokensAsync(user);
         }
 
+        // Будую сам JWT — claims, ключ, підпис.
+        // Кидаю ArgumentNullException тут, бо без ключа токен буде невалідний і краще впасти явно.
         private async Task<string> GenerateAccessTokenAsync(AppUserEntity user)
         {
             if (string.IsNullOrWhiteSpace(_jwtSettings.SecretKey))
@@ -75,6 +87,7 @@ namespace Cars.BLL.Services
 
             var roles = await _userManager.GetRolesAsync(user);
 
+            // Стандартні claims + власні (firstName, lastName, image) — фронт читає їх без зайвих запитів
             var claims = new List<Claim>
             {
                 new(ClaimTypes.NameIdentifier, user.Id),
@@ -85,11 +98,13 @@ namespace Cars.BLL.Services
                 new("image", user.Image ?? string.Empty)
             };
 
+            // Ролі додаю окремо, бо їх може бути кілька
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
+            // HMAC-SHA256 — симетричне підписання, секрет тільки на сервері
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -104,12 +119,16 @@ namespace Cars.BLL.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        // Генерую непередбачуваний токен через криптографічний RNG, а не System.Random —
+        // 64 байти = 512 біт ентропії, brute force нереальний.
         private static RefreshTokenEntity GenerateRefreshToken()
         {
             var bytes = new byte[64];
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(bytes);
 
+            // 7 днів — компроміс між зручністю (не треба часто логінитись) і безпекою.
+            // Прострочені токени прибирає RefreshTokensCleanupJob щонеділі.
             return new RefreshTokenEntity
             {
                 Token = Convert.ToBase64String(bytes),

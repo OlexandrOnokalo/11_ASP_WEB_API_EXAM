@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Cars.BLL.Dtos.Manufacture
 {
+    // DTO — вхід PUT; Id в тілі запиту має збігатись з id з route — ManufactureService перевіряє.
     public class UpdateManufactureDto
     {
         [Required]
