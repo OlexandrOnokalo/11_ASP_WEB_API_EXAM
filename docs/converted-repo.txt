@@ -1,0 +1,4061 @@
+Selected Files Directory Structure:
+
+└── ./
+    ├── Cars.API
+    │   ├── Controllers
+    │   │   ├── AuthController.cs
+    │   │   ├── CarsController.cs
+    │   │   └── ManufacturesController.cs
+    │   ├── Infrastructure
+    │   │   └── DependencyInjectionExtensions.cs
+    │   ├── Jobs
+    │   │   └── RefreshTokensCleanupJob.cs
+    │   ├── Middlewares
+    │   │   └── ExceptionMiddleware.cs
+    │   ├── Models
+    │   │   └── ErrorResponseDto.cs
+    │   ├── Properties
+    │   │   └── launchSettings.json
+    │   ├── Settings
+    │   │   └── StaticFilesSettings.cs
+    │   ├── appsettings.Development.json
+    │   ├── appsettings.json
+    │   ├── Cars.API.csproj
+    │   └── Program.cs
+    ├── Cars.BLL
+    │   ├── Dtos
+    │   │   ├── Auth
+    │   │   │   ├── AuthResultDto.cs
+    │   │   │   ├── AuthUserDto.cs
+    │   │   │   ├── JwtDto.cs
+    │   │   │   ├── LoginDto.cs
+    │   │   │   ├── RefreshTokenRequestDto.cs
+    │   │   │   ├── RegisterDto.cs
+    │   │   │   └── RegisterResultDto.cs
+    │   │   ├── Car
+    │   │   │   ├── CarItemDto.cs
+    │   │   │   ├── CarManufactureDto.cs
+    │   │   │   ├── CreateCarDto.cs
+    │   │   │   ├── GetCarsByPriceQueryDto.cs
+    │   │   │   ├── GetCarsQueryDto.cs
+    │   │   │   └── UpdateCarDto.cs
+    │   │   ├── Common
+    │   │   │   ├── ApiResponseDto.cs
+    │   │   │   └── PagedDataDto.cs
+    │   │   └── Manufacture
+    │   │       ├── CreateManufactureDto.cs
+    │   │       ├── ManufactureItemDto.cs
+    │   │       └── UpdateManufactureDto.cs
+    │   ├── MapperProfiles
+    │   │   ├── CarMapperProfile.cs
+    │   │   └── ManufactureMapperProfile.cs
+    │   ├── Services
+    │   │   ├── AuthService.cs
+    │   │   ├── CarService.cs
+    │   │   ├── ImageService.cs
+    │   │   ├── JwtService.cs
+    │   │   └── ManufactureService.cs
+    │   ├── Settings
+    │   │   └── JwtSettings.cs
+    │   └── Cars.BLL.csproj
+    ├── Cars.DAL
+    │   ├── Entities
+    │   │   ├── Identity
+    │   │   │   ├── AppRoleEntity.cs
+    │   │   │   └── AppUserEntity.cs
+    │   │   ├── CarEntity.cs
+    │   │   ├── ManufactureEntity.cs
+    │   │   └── RefreshTokenEntity.cs
+    │   ├── Migrations
+    │   │   ├── 20260417125232_InitIdentityAuth.cs
+    │   │   ├── 20260417125232_InitIdentityAuth.Designer.cs
+    │   │   ├── 20260417140323_FinalAuthFilesQuartz.cs
+    │   │   ├── 20260417140323_FinalAuthFilesQuartz.Designer.cs
+    │   │   └── AppDbContextModelSnapshot.cs
+    │   ├── Repositories
+    │   │   └── RefreshTokenRepository.cs
+    │   ├── Seed
+    │   │   ├── DataSeeder.cs
+    │   │   └── Seeder.cs
+    │   ├── AppDbContext.cs
+    │   └── Cars.DAL.csproj
+    ├── .gitattributes
+    └── 11_ASP_WEB_API_EXAM.slnx
+
+
+
+--- .gitattributes ---
+
+###############################################################################
+# Set default behavior to automatically normalize line endings.
+###############################################################################
+* text=auto
+
+###############################################################################
+# Set default behavior for command prompt diff.
+#
+# This is need for earlier builds of msysgit that does not have it on by
+# default for csharp files.
+# Note: This is only used by command line
+###############################################################################
+#*.cs     diff=csharp
+
+###############################################################################
+# Set the merge driver for project and solution files
+#
+# Merging from the command prompt will add diff markers to the files if there
+# are conflicts (Merging from VS is not affected by the settings below, in VS
+# the diff markers are never inserted). Diff markers may cause the following 
+# file extensions to fail to load in VS. An alternative would be to treat
+# these files as binary and thus will always conflict and require user
+# intervention with every merge. To do so, just uncomment the entries below
+###############################################################################
+#*.sln       merge=binary
+#*.csproj    merge=binary
+#*.vbproj    merge=binary
+#*.vcxproj   merge=binary
+#*.vcproj    merge=binary
+#*.dbproj    merge=binary
+#*.fsproj    merge=binary
+#*.lsproj    merge=binary
+#*.wixproj   merge=binary
+#*.modelproj merge=binary
+#*.sqlproj   merge=binary
+#*.wwaproj   merge=binary
+
+###############################################################################
+# behavior for image files
+#
+# image files are treated as binary by default.
+###############################################################################
+#*.jpg   binary
+#*.png   binary
+#*.gif   binary
+
+###############################################################################
+# diff behavior for common document formats
+# 
+# Convert binary document formats to text before diffing them. This feature
+# is only available from the command line. Turn it on by uncommenting the 
+# entries below.
+###############################################################################
+#*.doc   diff=astextplain
+#*.DOC   diff=astextplain
+#*.docx  diff=astextplain
+#*.DOCX  diff=astextplain
+#*.dot   diff=astextplain
+#*.DOT   diff=astextplain
+#*.pdf   diff=astextplain
+#*.PDF   diff=astextplain
+#*.rtf   diff=astextplain
+#*.RTF   diff=astextplain
+
+
+--- 11_ASP_WEB_API_EXAM.slnx ---
+
+<Solution>
+  <Project Path="Cars.API/Cars.API.csproj" />
+  <Project Path="Cars.BLL/Cars.BLL.csproj" />
+  <Project Path="Cars.DAL/Cars.DAL.csproj" />
+</Solution>
+
+
+--- Cars.API/Cars.API.csproj ---
+
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.OpenApi" Version="2.4.1" />
+    <PackageReference Include="Quartz.AspNetCore" Version="3.18.0" />
+    <PackageReference Include="Serilog" Version="4.3.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cars.BLL\Cars.BLL.csproj" />
+    <ProjectReference Include="..\Cars.DAL\Cars.DAL.csproj" />
+  </ItemGroup>
+
+</Project>
+
+
+--- Cars.API/Controllers/AuthController.cs ---
+
+using Cars.BLL.Dtos.Auth;
+using Cars.BLL.Dtos.Common;
+using Cars.BLL.Services;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Cars.API.Controllers
+{
+    [ApiController]
+    [Route("api/auth")]
+    public class AuthController : ControllerBase
+    {
+        private readonly AuthService _authService;
+        // JwtService є окремо — refresh це операція над токеном, а не бізнес-логіка усера;
+        // вирішив не мішати це в AuthService
+        private readonly JwtService _jwtService;
+
+        public AuthController(AuthService authService, JwtService jwtService)
+        {
+            _authService = authService;
+            _jwtService = jwtService;
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> RegisterAsync([FromBody] RegisterDto dto)
+        {
+            var result = await _authService.RegisterAsync(dto);
+            return Ok(new ApiResponseDto<RegisterResultDto> { Data = result });
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> LoginAsync([FromBody] LoginDto dto)
+        {
+            var result = await _authService.LoginAsync(dto);
+            return Ok(new ApiResponseDto<AuthResultDto> { Data = result });
+        }
+
+        // Refresh іде через JwtService — перевіряє чи токен не протермінований і не використаний,
+        // потім видає нову пару access+refresh — одноразове використання (rotation)
+        [HttpPost("refresh")]
+        public async Task<IActionResult> RefreshAsync([FromBody] RefreshTokenRequestDto dto)
+        {
+            var result = await _jwtService.RefreshAsync(dto.RefreshToken);
+            return Ok(new ApiResponseDto<JwtDto> { Data = result });
+        }
+
+        // GET з querystring — бо посилання підтвердження приходить лінком у листі;
+        // userId та token це параметри URL, а не тіло запиту
+        [HttpGet("confirm-email")]
+        public async Task<IActionResult> ConfirmEmailAsync([FromQuery] string userId, [FromQuery] string token)
+        {
+            await _authService.ConfirmEmailAsync(userId, token);
+            return Ok(new ApiResponseDto<object> { Data = new { message = "Email успішно підтверджено." } });
+        }
+    }
+}
+
+--- Cars.API/Controllers/CarsController.cs ---
+
+using Cars.API.Models;
+using Cars.API.Settings;
+using Cars.BLL.Dtos.Car;
+using Cars.BLL.Dtos.Common;
+using Cars.BLL.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Cars.API.Controllers
+{
+    [ApiController]
+    [Route("api/cars")]
+    public class CarsController : ControllerBase
+    {
+        private readonly CarService _carService;
+        private readonly string _carsPath;
+
+        public CarsController(CarService carService, IWebHostEnvironment environment)
+        {
+            _carService = carService;
+
+            // Рахую фізичний шлях один раз у конструкторі, щоб не робити Path.Combine на кожному запиті
+            string rootPath = environment.ContentRootPath;
+            _carsPath = Path.Combine(rootPath, StaticFilesSettings.StorageDir, StaticFilesSettings.CarsDir);
+            // Створюю папку якщо немає — наприклад при чистому репозиторії без Storage/
+            Directory.CreateDirectory(_carsPath);
+        }
+
+        // GET без [Authorize] — перегляд каталогу доступний всім, реєстрація не потрібна
+        [HttpGet]
+        public async Task<IActionResult> GetAsync(
+            [FromQuery] int page = 1,
+            [FromQuery(Name = "page_size")] int pageSize = 100,
+            [FromQuery] string? property = null,
+            [FromQuery] string? value = null)
+        {
+            var dto = new GetCarsQueryDto
+            {
+                Page = page,
+                PageSize = pageSize,
+                Property = property,
+                Value = value
+            };
+
+            var result = await _carService.GetAllAsync(dto);
+            return Ok(new ApiResponseDto<PagedDataDto<CarItemDto>> { Data = result });
+        }
+
+        [HttpGet("{id:int}", Name = "GetCarById")]
+        public async Task<IActionResult> GetByIdAsync(int id)
+        {
+            var result = await _carService.GetByIdAsync(id);
+            if (result == null)
+            {
+                return NotFound(new ErrorResponseDto { Message = "Car not found." });
+            }
+
+            return Ok(new ApiResponseDto<CarItemDto> { Data = result });
+        }
+
+        [HttpGet("by-price")]
+        public async Task<IActionResult> GetByPriceAsync(
+            [FromQuery] decimal minValue,
+            [FromQuery] decimal maxValue,
+            [FromQuery] int page = 1,
+            [FromQuery(Name = "page_size")] int pageSize = 100)
+        {
+            var dto = new GetCarsByPriceQueryDto
+            {
+                MinValue = minValue,
+                MaxValue = maxValue,
+                Page = page,
+                PageSize = pageSize
+            };
+
+            var result = await _carService.GetByPriceAsync(dto);
+            return Ok(new ApiResponseDto<PagedDataDto<CarItemDto>> { Data = result });
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPost]
+        public async Task<IActionResult> CreateAsync([FromForm] CreateCarDto dto)
+        {
+            var created = await _carService.CreateAsync(dto, _carsPath);
+            // CreatedAtRoute повертає 201 + Location header — клієнт знає куди робити GET нового авто
+            return CreatedAtRoute("GetCarById", new { id = created.Id }, new ApiResponseDto<CarItemDto> { Data = created });
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> UpdateAsync(int id, [FromForm] UpdateCarDto dto)
+        {
+            var updated = await _carService.UpdateAsync(id, dto, _carsPath);
+            if (updated == null)
+            {
+                return NotFound(new ErrorResponseDto { Message = "Car not found." });
+            }
+
+            return Ok(new ApiResponseDto<CarItemDto> { Data = updated });
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            // false — авто не знайшло (BLL не кидає виняток в цьому кейсі)
+            bool deleted = await _carService.DeleteAsync(id, _carsPath);
+            if (!deleted)
+            {
+                return NotFound(new ErrorResponseDto { Message = "Car not found." });
+            }
+
+            return NoContent();
+        }
+    }
+}
+
+--- Cars.API/Controllers/ManufacturesController.cs ---
+
+using Cars.API.Models;
+using Cars.BLL.Dtos.Common;
+using Cars.BLL.Dtos.Manufacture;
+using Cars.BLL.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Cars.API.Controllers
+{
+    [ApiController]
+    [Route("api/manufactures")]
+    public class ManufacturesController : ControllerBase
+    {
+        private readonly ManufactureService _manufactureService;
+
+        public ManufacturesController(ManufactureService manufactureService)
+        {
+            _manufactureService = manufactureService;
+        }
+
+        // GET без [Authorize] — список виробників публічний, бо фронт показує їх в дропдауні при створенні авто
+        [HttpGet]
+        public async Task<IActionResult> GetAsync([FromQuery] int page = 1, [FromQuery(Name = "page_size")] int pageSize = 100)
+        {
+            var result = await _manufactureService.GetAllAsync(page, pageSize);
+            return Ok(new ApiResponseDto<PagedDataDto<ManufactureItemDto>> { Data = result });
+        }
+
+        [HttpGet("{id:int}", Name = "GetManufactureById")]
+        public async Task<IActionResult> GetByIdAsync(int id)
+        {
+            var result = await _manufactureService.GetByIdAsync(id);
+            if (result == null)
+            {
+                return NotFound(new ErrorResponseDto { Message = "Manufacture not found." });
+            }
+
+            return Ok(new ApiResponseDto<ManufactureItemDto> { Data = result });
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPost]
+        public async Task<IActionResult> CreateAsync([FromBody] CreateManufactureDto dto)
+        {
+            var created = await _manufactureService.CreateAsync(dto);
+            // 201 + Location header, аналогічно CarsController
+            return CreatedAtRoute("GetManufactureById", new { id = created.Id }, new ApiResponseDto<ManufactureItemDto> { Data = created });
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateManufactureDto dto)
+        {
+            var updated = await _manufactureService.UpdateAsync(id, dto);
+            if (updated == null)
+            {
+                return NotFound(new ErrorResponseDto { Message = "Manufacture not found." });
+            }
+
+            return Ok(new ApiResponseDto<ManufactureItemDto> { Data = updated });
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            // false може бути і через неіснуючий id, і через каскадне блокування —
+            // BLL кидає ArgumentException якщо виробник має пов'язані авто, а middleware перехопить це в 400
+            bool deleted = await _manufactureService.DeleteAsync(id);
+            if (!deleted)
+            {
+                return NotFound(new ErrorResponseDto { Message = "Manufacture not found." });
+            }
+
+            return NoContent();
+        }
+    }
+}
+
+--- Cars.API/Infrastructure/DependencyInjectionExtensions.cs ---
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Quartz;
+using System.Text;
+
+namespace Cars.API.Infrastructure
+{
+    public static class DependencyInjectionExtensions
+    {
+        public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
+        {
+            // Падаю одразу при старті якщо ключ не налаштований —
+            // краще вибухнути тут ніж отримати 500 на першому ж запиті
+            string? secretKey = configuration["JwtSettings:SecretKey"];
+            if (string.IsNullOrWhiteSpace(secretKey))
+            {
+                throw new ArgumentNullException(nameof(secretKey), "Jwt secret key is null");
+            }
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateIssuerSigningKey = true,
+                    RequireExpirationTime = true,
+                    ValidateLifetime = true,
+                    // ClockSkew = Zero — прибираю дефолтний допуск у 5 хвилин;
+                    // токен живе рівно стільки, скільки сказано в ExpHours, не більше
+                    ClockSkew = TimeSpan.Zero,
+                    ValidAudience = configuration["JwtSettings:Audience"],
+                    ValidIssuer = configuration["JwtSettings:Issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                };
+            });
+
+            return services;
+        }
+
+        // Приймаю довільну кількість пар (тип job, CRON) —
+        // щоб додати нову задачу достатньо передати ще один елемент у Program.cs
+        public static IServiceCollection AddJobs(this IServiceCollection services, params (Type type, string cronSchedule)[] jobs)
+        {
+            services.AddQuartz(q =>
+            {
+                foreach (var job in jobs)
+                {
+                    // Ім'я ключа беру з назви класу — зручно бачити в логах Quartz
+                    var jobKey = new JobKey(job.type.Name);
+
+                    q.AddJob(job.type, jobKey);
+
+                    q.AddTrigger(opts => opts
+                        .ForJob(jobKey)
+                        .WithIdentity($"{job.type.Name}-trigger")
+                        .WithCronSchedule(job.cronSchedule));
+                }
+            });
+
+            return services;
+        }
+    }
+}
+
+--- Cars.API/Jobs/RefreshTokensCleanupJob.cs ---
+
+using Cars.DAL.Repositories;
+using Quartz;
+
+namespace Cars.API.Jobs
+{
+    // Quartz-задача, яка стріляє по неділях о 00:00 —
+    // прибираю БД від протермінованих refresh токенів, що ніхто вже не може використати
+    public class RefreshTokensCleanupJob : IJob
+    {
+        private readonly RefreshTokenRepository _refreshTokenRepository;
+        private readonly ILogger<RefreshTokensCleanupJob> _logger;
+
+        public RefreshTokensCleanupJob(
+            RefreshTokenRepository refreshTokenRepository,
+            ILogger<RefreshTokensCleanupJob> logger)
+        {
+            _refreshTokenRepository = refreshTokenRepository;
+            _logger = logger;
+        }
+
+        public async Task Execute(IJobExecutionContext context)
+        {
+            // 7 днів — рівно TTL refresh токена в JwtService;
+            // видаляю тільки ті, що вже протермінували і прожили цей строк — активні не чіпаю
+            int deleted = await _refreshTokenRepository.DeleteExpiredOlderThanDaysAsync(7);
+
+            _logger.LogInformation(
+                "RefreshTokensCleanupJob виконано. Видалено refresh token: {Count}",
+                deleted);
+        }
+    }
+}
+
+--- Cars.API/Middlewares/ExceptionMiddleware.cs ---
+
+using Cars.API.Models;
+
+namespace Cars.API.Middlewares
+{
+    // Централізована обробка помилок — будь-який неперехоплений виняток зі сервісів/репозиторії
+    // потрапляє сюди і перетворюється на JSON-відповідь замість стандартного HTML 500
+    public class ExceptionMiddleware
+    {
+        private readonly RequestDelegate _next;
+        private readonly ILogger<ExceptionMiddleware> _logger;
+
+        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+        {
+            _next = next;
+            _logger = logger;
+        }
+
+        public async Task InvokeAsync(HttpContext context)
+        {
+            try
+            {
+                await _next(context);
+            }
+            // ArgumentException та InvalidOperationException — очікувані бізнес-помилки (email зайнятий,
+            // виробник не знайшов тощо) — повертаю 400 і логую як Warning, бо це не наша помилка
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, ex.Message);
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsJsonAsync(new ErrorResponseDto { Message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, ex.Message);
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsJsonAsync(new ErrorResponseDto { Message = ex.Message });
+            }
+            // Будь-яке інше — це вже несподіване, повертаю 500 без деталей —
+            // stack trace назовні не віддаю, тільки в логи
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                await context.Response.WriteAsJsonAsync(new ErrorResponseDto { Message = "Internal server error." });
+            }
+        }
+    }
+}
+
+--- Cars.API/Models/ErrorResponseDto.cs ---
+
+namespace Cars.API.Models
+{
+    public class ErrorResponseDto
+    {
+        public string Message { get; set; } = string.Empty;
+        public Dictionary<string, string[]>? Errors { get; set; }
+    }
+}
+
+--- Cars.API/Program.cs ---
+
+using Cars.API.Infrastructure;
+using Cars.API.Jobs;
+using Cars.API.Middlewares;
+using Cars.API.Models;
+using Cars.API.Settings;
+using Cars.BLL.MapperProfiles;
+using Cars.BLL.Services;
+using Cars.DAL;
+using Cars.DAL.Entities.Identity;
+using Cars.DAL.Repositories;
+using Cars.DAL.Seed;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.OpenApi;
+using Quartz;
+using Serilog;
+using JwtSettings = Cars.BLL.Settings.JwtSettings;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Serilog підключаю першим — щоб навіть помилки старту програми потрапили в лог
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+// Add dbcontext
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    string? connectionString = builder.Configuration.GetConnectionString("LocalDb");
+    options.UseNpgsql(connectionString);
+});
+
+// Settings
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
+// Add identity
+// Свідомо послабив вимоги до пароля — це навчальний проєкт, не продакшн;
+// у реальному додатку RequireUppercase/RequireDigit варто вмикати
+builder.Services.AddIdentity<AppUserEntity, AppRoleEntity>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+
+    options.Password.RequiredUniqueChars = 1;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireDigit = false;
+})
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+// Add authentication
+builder.Services.AddJwtAuthentication(builder.Configuration);
+
+// Quartz (щотижня у неділю о 00:00)
+// WaitForJobsToComplete = true — щоб при зупинці сервера Quartz дочекався завершення джобу,
+// а не обрізав DELETE посередині
+builder.Services.AddJobs(
+    (typeof(RefreshTokensCleanupJob), "0 0 0 ? * SUN")
+);
+builder.Services.AddQuartzHostedService(cfg => cfg.WaitForJobsToComplete = true);
+
+// CORS
+const string corsPolicyName = "allowAll";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(corsPolicyName, policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+// Add services to the container.
+builder.Services.AddControllers();
+
+// Validation response format
+// Перевизначаю стандартну відповідь 400 від ASP.NET — хочу отримувати
+// свій ErrorResponseDto з полем errors замість дефолтного ProblemDetails
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(x => x.Value?.Errors.Count > 0)
+            .ToDictionary(
+                x => x.Key,
+                x => x.Value!.Errors
+                    .Select(e => string.IsNullOrWhiteSpace(e.ErrorMessage) ? "Invalid value." : e.ErrorMessage)
+                    .ToArray()
+            );
+
+        var response = new ErrorResponseDto
+        {
+            Message = "Validation failed",
+            Errors = errors
+        };
+
+        return new BadRequestObjectResult(response);
+    };
+});
+
+// OpenAPI/Swagger
+builder.Services.AddOpenApi();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Cars API",
+        Version = "v1"
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Введіть JWT токен у форматі: Bearer {token}"
+    });
+
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecuritySchemeReference("Bearer", document),
+            new List<string>()
+        }
+    });
+});
+
+// Repositories
+builder.Services.AddScoped<RefreshTokenRepository>();
+
+// Services
+builder.Services.AddScoped<ManufactureService>();
+builder.Services.AddScoped<CarService>();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<ImageService>();
+builder.Services.AddAutoMapper(cfg => { }, typeof(CarMapperProfile).Assembly);
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+
+// Static files for cars images
+// Маплю фізичну папку Storage/Cars/ на URL-префікс /images/cars —
+// так фронт може брати зображення напряму без контролера
+string storagePath = Path.Combine(app.Environment.ContentRootPath, StaticFilesSettings.StorageDir, StaticFilesSettings.CarsDir);
+if (!Directory.Exists(storagePath))
+{
+    // Папка може не існувати при першому запуску — створюю щоб UseStaticFiles не впав
+    Directory.CreateDirectory(storagePath);
+}
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(storagePath),
+    RequestPath = StaticFilesSettings.CarsUrl
+});
+
+app.UseCors(corsPolicyName);
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+// ExceptionMiddleware іде після auth — щоб помилки авторизації теж
+// перехоплювались і поверталися у форматі ErrorResponseDto
+app.UseMiddleware<ExceptionMiddleware>();
+
+app.MapControllers();
+
+// Сідер запускаю після app.Build() але до app.Run() —
+// міграції та дефолтні дані мають бути в БД до першого реального запиту
+await Seeder.SeedAsync(app.Services);
+
+app.Run();
+
+// Явний flush — гарантую що останні логи запишуться при завершенні процесу
+Log.CloseAndFlush();
+
+
+--- Cars.API/Properties/launchSettings.json ---
+
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "http": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "applicationUrl": "http://localhost:5095",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "https": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "applicationUrl": "https://localhost:7178;http://localhost:5095",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
+
+
+--- Cars.API/Settings/StaticFilesSettings.cs ---
+
+namespace Cars.API.Settings
+{
+    public static class StaticFilesSettings
+    {
+        public const string StorageDir = "Storage";
+        public const string CarsDir = "Cars";
+        public const string CarsUrl = "/images/cars";
+    }
+}
+
+--- Cars.API/appsettings.Development.json ---
+
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}
+
+
+--- Cars.API/appsettings.json ---
+
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "LocalDb": "User ID=postgres;Password=qwerty;Host=localhost;Port=5432;Database=Cars;"
+  },
+  "JwtSettings": {
+    "Issuer": "cars_react",
+    "Audience": "cars_aspnet",
+    "SecretKey": "eirXXMXpyDFEPfARKtaAfHGpy4VwN8BgMm11Tq8D0grgqwZfMT2FRZAVYuP6Cs22",
+    "ExpHours": 1
+  }
+}
+
+
+--- Cars.BLL/Cars.BLL.csproj ---
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="16.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.5" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.17.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cars.DAL\Cars.DAL.csproj" />
+  </ItemGroup>
+
+</Project>
+
+
+--- Cars.BLL/Dtos/Auth/AuthResultDto.cs ---
+
+namespace Cars.BLL.Dtos.Auth
+{
+    public class AuthResultDto
+    {
+        public JwtDto Tokens { get; set; } = new();
+        public AuthUserDto User { get; set; } = new();
+    }
+}
+
+--- Cars.BLL/Dtos/Auth/AuthUserDto.cs ---
+
+namespace Cars.BLL.Dtos.Auth
+{
+    public class AuthUserDto
+    {
+        public string Id { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string[] Roles { get; set; } = [];
+    }
+}
+
+--- Cars.BLL/Dtos/Auth/JwtDto.cs ---
+
+namespace Cars.BLL.Dtos.Auth
+{
+    public class JwtDto
+    {
+        public string AccessToken { get; set; } = string.Empty;
+        public string RefreshToken { get; set; } = string.Empty;
+        public DateTime ExpiresAtUtc { get; set; }
+    }
+}
+
+--- Cars.BLL/Dtos/Auth/LoginDto.cs ---
+
+using System.ComponentModel.DataAnnotations;
+
+namespace Cars.BLL.Dtos.Auth
+{
+    public class LoginDto
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        [Required]
+        [MinLength(6)]
+        public string Password { get; set; } = string.Empty;
+    }
+}
+
+--- Cars.BLL/Dtos/Auth/RefreshTokenRequestDto.cs ---
+
+using System.ComponentModel.DataAnnotations;
+
+namespace Cars.BLL.Dtos.Auth
+{
+    public class RefreshTokenRequestDto
+    {
+        [Required]
+        public string RefreshToken { get; set; } = string.Empty;
+    }
+}
+
+--- Cars.BLL/Dtos/Auth/RegisterDto.cs ---
+
+using System.ComponentModel.DataAnnotations;
+
+namespace Cars.BLL.Dtos.Auth
+{
+    public class RegisterDto
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        [Required]
+        [MinLength(3)]
+        public string UserName { get; set; } = string.Empty;
+
+        [Required]
+        [MinLength(6)]
+        public string Password { get; set; } = string.Empty;
+
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+    }
+}
+
+--- Cars.BLL/Dtos/Auth/RegisterResultDto.cs ---
+
+namespace Cars.BLL.Dtos.Auth
+{
+    public class RegisterResultDto
+    {
+        public string Message { get; set; } = string.Empty;
+        public string UserId { get; set; } = string.Empty;
+        public string ConfirmationToken { get; set; } = string.Empty;
+    }
+}
+
+--- Cars.BLL/Dtos/Car/CarItemDto.cs ---
+
+namespace Cars.BLL.Dtos.Car
+{
+    public class CarItemDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public int ManufactureId { get; set; }
+        public int Year { get; set; }
+        public decimal Volume { get; set; }
+        public decimal Price { get; set; }
+        public string Color { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public string? Image { get; set; }
+
+        public CarManufactureDto? Manufacture { get; set; }
+    }
+}
+
+--- Cars.BLL/Dtos/Car/CarManufactureDto.cs ---
+
+namespace Cars.BLL.Dtos.Car
+{
+    public class CarManufactureDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+}
+
+--- Cars.BLL/Dtos/Car/CreateCarDto.cs ---
+
+using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
+
+namespace Cars.BLL.Dtos.Car
+{
+    public class CreateCarDto
+    {
+        [Required]
+        [MaxLength(120)]
+        public string Name { get; set; } = string.Empty;
+
+        [Required]
+        public int ManufactureId { get; set; }
+
+        [Required]
+        [Range(1900, 2100)]
+        public int Year { get; set; }
+
+        [Required]
+        [Range(0.01, 1000)]
+        public decimal Volume { get; set; }
+
+        [Required]
+        [Range(0, 1000000000)]
+        public decimal Price { get; set; }
+
+        [Required]
+        [MaxLength(40)]
+        public string Color { get; set; } = string.Empty;
+
+        public string? Description { get; set; }
+
+        // Тимчасова сумісність з фронтом (описка у полі)
+        public string? Desciption { get; set; }
+
+        public IFormFile? Image { get; set; }
+    }
+}
+
+--- Cars.BLL/Dtos/Car/GetCarsByPriceQueryDto.cs ---
+
+namespace Cars.BLL.Dtos.Car
+{
+    public class GetCarsByPriceQueryDto
+    {
+        public decimal MinValue { get; set; }
+        public decimal MaxValue { get; set; }
+
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 100;
+    }
+}
+
+--- Cars.BLL/Dtos/Car/GetCarsQueryDto.cs ---
+
+namespace Cars.BLL.Dtos.Car
+{
+    public class GetCarsQueryDto
+    {
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 100;
+
+        public string? Property { get; set; }
+        public string? Value { get; set; }
+    }
+}
+
+--- Cars.BLL/Dtos/Car/UpdateCarDto.cs ---
+
+using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
+
+namespace Cars.BLL.Dtos.Car
+{
+    public class UpdateCarDto
+    {
+        [Required]
+        [MaxLength(120)]
+        public string Name { get; set; } = string.Empty;
+
+        [Required]
+        public int ManufactureId { get; set; }
+
+        [Required]
+        [Range(1900, 2100)]
+        public int Year { get; set; }
+
+        [Required]
+        [Range(0.01, 1000)]
+        public decimal Volume { get; set; }
+
+        [Required]
+        [Range(0, 1000000000)]
+        public decimal Price { get; set; }
+
+        [Required]
+        [MaxLength(40)]
+        public string Color { get; set; } = string.Empty;
+
+        public string? Description { get; set; }
+
+        // Тимчасова сумісність з фронтом (описка у полі)
+        public string? Desciption { get; set; }
+
+        public IFormFile? Image { get; set; }
+    }
+}
+
+--- Cars.BLL/Dtos/Common/ApiResponseDto.cs ---
+
+namespace Cars.BLL.Dtos.Common
+{
+    public class ApiResponseDto<T>
+    {
+        public T Data { get; set; } = default!;
+    }
+}
+
+--- Cars.BLL/Dtos/Common/PagedDataDto.cs ---
+
+namespace Cars.BLL.Dtos.Common
+{
+    public class PagedDataDto<T>
+    {
+        public List<T> Items { get; set; } = [];
+        public int TotalCount { get; set; }
+        public int Page { get; set; }
+        public int PageSize { get; set; }
+    }
+}
+
+--- Cars.BLL/Dtos/Manufacture/CreateManufactureDto.cs ---
+
+using System.ComponentModel.DataAnnotations;
+
+namespace Cars.BLL.Dtos.Manufacture
+{
+    public class CreateManufactureDto
+    {
+        [Required]
+        [MaxLength(100)]
+        public string Name { get; set; } = string.Empty;
+    }
+}
+
+--- Cars.BLL/Dtos/Manufacture/ManufactureItemDto.cs ---
+
+namespace Cars.BLL.Dtos.Manufacture
+{
+    public class ManufactureItemDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+}
+
+--- Cars.BLL/Dtos/Manufacture/UpdateManufactureDto.cs ---
+
+using System.ComponentModel.DataAnnotations;
+
+namespace Cars.BLL.Dtos.Manufacture
+{
+    public class UpdateManufactureDto
+    {
+        [Required]
+        public int Id { get; set; }
+
+        [Required]
+        [MaxLength(100)]
+        public string Name { get; set; } = string.Empty;
+    }
+}
+
+--- Cars.BLL/MapperProfiles/CarMapperProfile.cs ---
+
+using AutoMapper;
+using Cars.BLL.Dtos.Car;
+using Cars.DAL.Entities;
+
+namespace Cars.BLL.MapperProfiles
+{
+    public class CarMapperProfile : Profile
+    {
+        public CarMapperProfile()
+        {
+            CreateMap<ManufactureEntity, CarManufactureDto>();
+
+            CreateMap<CarEntity, CarItemDto>()
+                // навігаційне проперті — вказую явно, бо AutoMapper не знаходить неставлений об’єкт автоматично
+                .ForMember(dest => dest.Manufacture, opt => opt.MapFrom(src => src.Manufacture));
+
+            CreateMap<CreateCarDto, CarEntity>()
+                // Image обробляється окремо через ImageService — якщо не Ignore(), AutoMapper покладе null
+                .ForMember(dest => dest.Image, opt => opt.Ignore())
+                // опечатка у вхідному DTO: поле називається Desciption — приймаю обидва варіанти для сумісності з клієнтами
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description ?? src.Desciption));
+
+            CreateMap<UpdateCarDto, CarEntity>()
+                .ForMember(dest => dest.Image, opt => opt.Ignore())
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description ?? src.Desciption));
+        }
+    }
+}
+
+--- Cars.BLL/MapperProfiles/ManufactureMapperProfile.cs ---
+
+using AutoMapper;
+using Cars.BLL.Dtos.Manufacture;
+using Cars.DAL.Entities;
+
+namespace Cars.BLL.MapperProfiles
+{
+    public class ManufactureMapperProfile : Profile
+    {
+        public ManufactureMapperProfile()
+        {
+            CreateMap<ManufactureEntity, ManufactureItemDto>();
+            CreateMap<CreateManufactureDto, ManufactureEntity>();
+            CreateMap<UpdateManufactureDto, ManufactureEntity>();
+        }
+    }
+}
+
+--- Cars.BLL/Services/AuthService.cs ---
+
+using Cars.BLL.Dtos.Auth;
+using Cars.DAL.Entities.Identity;
+using Microsoft.AspNetCore.Identity;
+
+namespace Cars.BLL.Services
+{
+    public class AuthService
+    {
+        private readonly UserManager<AppUserEntity> _userManager;
+        private readonly RoleManager<AppRoleEntity> _roleManager;
+        private readonly JwtService _jwtService;
+
+        public AuthService(
+            UserManager<AppUserEntity> userManager,
+            RoleManager<AppRoleEntity> roleManager,
+            JwtService jwtService)
+        {
+            _userManager = userManager;
+            _roleManager = roleManager;
+            _jwtService = jwtService;
+        }
+
+        // вхідна точка реєстрації: перевіряю унікальність, створюю юзера, видаю токен для підтвердження email
+        public async Task<RegisterResultDto> RegisterAsync(RegisterDto dto)
+        {
+            // перевіряю email і username окремо, щоб дати точне повідомлення що саме зайняте
+            if (await _userManager.FindByEmailAsync(dto.Email) != null)
+            {
+                throw new InvalidOperationException($"Пошта '{dto.Email}' вже використовується.");
+            }
+
+            if (await _userManager.FindByNameAsync(dto.UserName) != null)
+            {
+                throw new InvalidOperationException($"Ім'я користувача '{dto.UserName}' зайняте.");
+            }
+
+            var user = new AppUserEntity
+            {
+                UserName = dto.UserName,
+                Email = dto.Email,
+                FirstName = dto.FirstName,
+                LastName = dto.LastName
+            };
+
+            // Identity сам хешує пароль — передаю сирий рядок, назовні він не зберігається
+            var createResult = await _userManager.CreateAsync(user, dto.Password);
+            if (!createResult.Succeeded)
+            {
+                throw new InvalidOperationException(createResult.Errors.First().Description);
+            }
+
+            // резерв на випадок якщо сидер не відпрацював — роль "user" має бути, але підстрахуюсь
+            if (!await _roleManager.RoleExistsAsync("user"))
+            {
+                await _roleManager.CreateAsync(new AppRoleEntity { Name = "user" });
+            }
+
+            await _userManager.AddToRoleAsync(user, "user");
+
+            // токен підтвердження може містити +, /, = — кодую, бо він піде в URL-параметр
+            string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            string encodedToken = Uri.EscapeDataString(token);
+
+            return new RegisterResultDto
+            {
+                Message = "Реєстрація успішна. Підтвердіть email через /api/auth/confirm-email",
+                UserId = user.Id,
+                ConfirmationToken = encodedToken
+            };
+        }
+
+        // вхідна точка логіну: знаходжу юзера, перевіряю пароль, делегую генерацію токенів у JwtService
+        public async Task<AuthResultDto> LoginAsync(LoginDto dto)
+        {
+            // шукаю по email, бо username не завжди знають — так зручніше
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user == null)
+            {
+                throw new InvalidOperationException($"Користувач з поштою '{dto.Email}' не існує.");
+            }
+
+            // Identity порівнює хеш сам — не торкаюсь паролю напряму
+            bool passwordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
+            if (!passwordValid)
+            {
+                throw new InvalidOperationException("Пароль вказано невірно.");
+            }
+
+            // роли потрібні і для claims у токені, і для відповіді клієнту — тягну окремо
+            var tokens = await _jwtService.GenerateTokensAsync(user);
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return new AuthResultDto
+            {
+                Tokens = tokens,
+                User = new AuthUserDto
+                {
+                    Id = user.Id,
+                    UserName = user.UserName ?? string.Empty,
+                    Email = user.Email ?? string.Empty,
+                    Roles = roles.ToArray()
+                }
+            };
+        }
+
+        // підтвердження email: розкодовую токен з URL і передаю Identity — він сам ставить EmailConfirmed = true
+        public async Task ConfirmEmailAsync(string userId, string token)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                throw new InvalidOperationException("Користувача не знайдено.");
+            }
+
+            // токен прийшов URL-encoded з query string — розкодовую назад перед передачею в Identity
+            string decodedToken = Uri.UnescapeDataString(token);
+            var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
+
+            if (!result.Succeeded)
+            {
+                throw new InvalidOperationException(result.Errors.First().Description);
+            }
+        }
+    }
+}
+
+--- Cars.BLL/Services/CarService.cs ---
+
+using AutoMapper;
+using Cars.BLL.Dtos.Car;
+using Cars.BLL.Dtos.Common;
+using Cars.DAL;
+using Cars.DAL.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace Cars.BLL.Services
+{
+    public class CarService
+    {
+        // дефолтні URL — передаю ці рядки в ImageService як захищені, щоб фізичні файли ніколи не видалялись
+        private const string ToyotaDefaultImage = "/images/cars/Toyota-logo.jpg";
+        private const string BmwDefaultImage = "/images/cars/BMW-logo.png";
+        private const string AudiDefaultImage = "/images/cars/audi-logo.png";
+        private const string CarsImagesUrl = "/images/cars";
+
+        private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
+        private readonly ImageService _imageService;
+
+        public CarService(AppDbContext context, IMapper mapper, ImageService imageService)
+        {
+            _context = context;
+            _mapper = mapper;
+            _imageService = imageService;
+        }
+
+        public async Task<PagedDataDto<CarItemDto>> GetAllAsync(GetCarsQueryDto queryDto)
+        {
+            int page = queryDto.Page;
+            int pageSize = queryDto.PageSize;
+            // не довіряю вхідним значенням — клієнт може передати 0 або негатив
+            NormalizePaging(ref page, ref pageSize);
+
+            // AsNoTracking — тільки читання, трекінг EF тут ні до чого
+            var query = _context.Cars
+                .AsNoTracking()
+                .Include(x => x.Manufacture)
+                .AsQueryable();
+
+            query = ApplyFilter(query, queryDto.Property, queryDto.Value);
+
+            // підраховую раз до Skip/Take, бо після дасть неправильний результат
+            var totalCount = await query.CountAsync();
+
+            var entities = await query
+                .OrderBy(x => x.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var items = _mapper.Map<List<CarItemDto>>(entities);
+
+            return new PagedDataDto<CarItemDto>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
+        }
+
+        public async Task<PagedDataDto<CarItemDto>> GetByPriceAsync(GetCarsByPriceQueryDto queryDto)
+        {
+            int page = queryDto.Page;
+            int pageSize = queryDto.PageSize;
+            NormalizePaging(ref page, ref pageSize);
+
+            decimal min = queryDto.MinValue;
+            decimal max = queryDto.MaxValue;
+
+            // якщо клієнт переплутав порядок — коригую сам, а не падаю помилку
+            if (min > max)
+            {
+                (min, max) = (max, min);
+            }
+
+            var query = _context.Cars
+                .AsNoTracking()
+                .Include(x => x.Manufacture)
+                .Where(x => x.Price >= min && x.Price <= max);
+
+            var totalCount = await query.CountAsync();
+
+            var entities = await query
+                .OrderBy(x => x.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var items = _mapper.Map<List<CarItemDto>>(entities);
+
+            return new PagedDataDto<CarItemDto>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
+        }
+
+        public async Task<CarItemDto?> GetByIdAsync(int id)
+        {
+            var entity = await _context.Cars
+                .AsNoTracking()
+                .Include(x => x.Manufacture)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            return entity == null ? null : _mapper.Map<CarItemDto>(entity);
+        }
+
+        public async Task<CarItemDto> CreateAsync(CreateCarDto dto, string imagesPath)
+        {
+            bool manufactureExists = await _context.Manufactures.AnyAsync(x => x.Id == dto.ManufactureId);
+            if (!manufactureExists)
+            {
+                throw new ArgumentException("Manufacture does not exist.");
+            }
+
+            var entity = _mapper.Map<CarEntity>(dto);
+            entity.Name = dto.Name.Trim();
+            entity.Color = dto.Color.Trim();
+            entity.Description = (dto.Description ?? dto.Desciption)?.Trim();
+            // спочатку дефолтне по бренду, і лише якщо є файл — перезаписую
+            entity.Image = await GetDefaultImageByManufactureIdAsync(dto.ManufactureId);
+
+            if (dto.Image != null)
+            {
+                entity.Image = await _imageService.SaveAsync(dto.Image, imagesPath, CarsImagesUrl);
+            }
+
+            _context.Cars.Add(entity);
+            await _context.SaveChangesAsync();
+
+            // повертаю через GetByIdAsync, бо там Include(Manufacture) і повний DTO з виробником
+            return (await GetByIdAsync(entity.Id))!;
+        }
+
+        public async Task<CarItemDto?> UpdateAsync(int id, UpdateCarDto dto, string imagesPath)
+        {
+            var entity = await _context.Cars.FirstOrDefaultAsync(x => x.Id == id);
+            if (entity == null)
+            {
+                return null;
+            }
+
+            bool manufactureExists = await _context.Manufactures.AnyAsync(x => x.Id == dto.ManufactureId);
+            if (!manufactureExists)
+            {
+                throw new ArgumentException("Manufacture does not exist.");
+            }
+
+            // зберігаю до маппінгу, бо після Map() entity.Image буде незмінним (Ignore()), але потрібнен для видалення старого
+            string? oldImage = entity.Image;
+
+            // маппінг в існуючу entity — Id і Image не торкаються (Ignore() в профілі)
+            _mapper.Map(dto, entity);
+
+            entity.Name = dto.Name.Trim();
+            entity.Color = dto.Color.Trim();
+            entity.Description = (dto.Description ?? dto.Desciption)?.Trim();
+
+            if (dto.Image != null)
+            {
+                // видаляю старий файл перед збереженням нового — дефолтні файли захищені всередині ImageService
+                _imageService.DeleteIfExists(oldImage, imagesPath, ToyotaDefaultImage, BmwDefaultImage, AudiDefaultImage);
+                entity.Image = await _imageService.SaveAsync(dto.Image, imagesPath, CarsImagesUrl);
+            }
+            else if (IsDefaultImage(oldImage))
+            {
+                // файл не завантажили, але виробник міг змінитись — оновлюю дефолтне зображення під новий бренд
+                entity.Image = await GetDefaultImageByManufactureIdAsync(dto.ManufactureId);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return await GetByIdAsync(entity.Id);
+        }
+
+        public async Task<bool> DeleteAsync(int id, string imagesPath)
+        {
+            var entity = await _context.Cars.FirstOrDefaultAsync(x => x.Id == id);
+            if (entity == null)
+            {
+                return false;
+            }
+
+            // видаляю фізичний файл до Remove, щоб не залишати сироту на диску
+            _imageService.DeleteIfExists(entity.Image, imagesPath, ToyotaDefaultImage, BmwDefaultImage, AudiDefaultImage);
+
+            _context.Cars.Remove(entity);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        private async Task<string> GetDefaultImageByManufactureIdAsync(int manufactureId)
+        {
+            // тягну тільки Name, бо вся entity заради одного поля — зайво багато
+            string? name = await _context.Manufactures
+                .AsNoTracking()
+                .Where(x => x.Id == manufactureId)
+                .Select(x => x.Name)
+                .FirstOrDefaultAsync();
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Manufacture does not exist.");
+            }
+
+            return name.Trim().ToLower() switch
+            {
+                "toyota" => ToyotaDefaultImage,
+                "bmw" => BmwDefaultImage,
+                "audi" => AudiDefaultImage,
+                // невідомий бренд — фолбек на Toyota, не null
+                _ => ToyotaDefaultImage
+            };
+        }
+
+        private static bool IsDefaultImage(string? imageUrl)
+        {
+            return string.Equals(imageUrl, ToyotaDefaultImage, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(imageUrl, BmwDefaultImage, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(imageUrl, AudiDefaultImage, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static IQueryable<CarEntity> ApplyFilter(IQueryable<CarEntity> query, string? property, string? value)
+        {
+            if (string.IsNullOrWhiteSpace(property) || string.IsNullOrWhiteSpace(value))
+            {
+                return query;
+            }
+
+            string p = property.Trim().ToLower();
+            string v = value.Trim();
+
+            return p switch
+            {
+                "name" => query.Where(x => x.Name.ToLower().Contains(v.ToLower())),
+                "manufacture" => query.Where(x => x.Manufacture != null && x.Manufacture.Name.ToLower().Contains(v.ToLower())),
+                // якщо значення не парситься — повертаю порожній список, а не ігнорую фільтр
+                "year" => int.TryParse(v, out int year) ? query.Where(x => x.Year == year) : query.Where(_ => false),
+                "color" => query.Where(x => x.Color.ToLower().Contains(v.ToLower())),
+                "volume" => decimal.TryParse(v, out decimal volume) ? query.Where(x => x.Volume == volume) : query.Where(_ => false),
+                _ => query
+            };
+        }
+
+        // захищаю від некоректних значень; pageSize > 500 — верхня межа щоб не вантажити забагато записів з БД
+        private static void NormalizePaging(ref int page, ref int pageSize)
+        {
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 100;
+            if (pageSize > 500) pageSize = 500;
+        }
+    }
+}
+
+--- Cars.BLL/Services/ImageService.cs ---
+
+using Microsoft.AspNetCore.Http;
+
+namespace Cars.BLL.Services
+{
+    public class ImageService
+    {
+        public async Task<string> SaveAsync(IFormFile file, string imagesPath, string requestPath)
+        {
+            if (file.Length == 0)
+            {
+                throw new ArgumentException("Файл зображення порожній.");
+            }
+
+            // не кидає помилку якщо директорія вже існує — зручно гарантую наявність
+            Directory.CreateDirectory(imagesPath);
+
+            string extension = Path.GetExtension(file.FileName);
+            // GUID — унікальне ім’я щоб не було колізій; розширення зберігаю, бо browser цікавиться на MIME-тип
+            string fileName = $"{Guid.NewGuid()}{extension}";
+            string fullPath = Path.Combine(imagesPath, fileName);
+
+            await using var stream = new FileStream(fullPath, FileMode.Create);
+            await file.CopyToAsync(stream);
+
+            // повертаю URL для збереження в БД, а не фізичний шлях — клієнт звертається за цим URL
+            return $"{requestPath}/{fileName}";
+        }
+
+        public void DeleteIfExists(string? imageUrl, string imagesPath, params string[] protectedUrls)
+        {
+            if (string.IsNullOrWhiteSpace(imageUrl))
+            {
+                return;
+            }
+
+            // дефолтні логотипи ніколи не видаляються — передаються ззовні через params
+            if (protectedUrls.Any(x => string.Equals(x, imageUrl, StringComparison.OrdinalIgnoreCase)))
+            {
+                return;
+            }
+
+            // в БД зберігаю URL, а не шлях — витягую лише ім’я файлу і складаю фізичний шлях самостійно
+            string fileName = Path.GetFileName(imageUrl);
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                return;
+            }
+
+            string fullPath = Path.Combine(imagesPath, fileName);
+            // File.Delete кидає виняток якщо файл не існує — тому перевіряю заранісь
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+            }
+        }
+    }
+}
+
+--- Cars.BLL/Services/JwtService.cs ---
+
+using Cars.BLL.Dtos.Auth;
+using Cars.BLL.Settings;
+using Cars.DAL.Entities;
+using Cars.DAL.Entities.Identity;
+using Cars.DAL.Repositories;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+
+namespace Cars.BLL.Services
+{
+    public class JwtService
+    {
+        private readonly JwtSettings _jwtSettings;
+        private readonly UserManager<AppUserEntity> _userManager;
+        private readonly RefreshTokenRepository _refreshTokenRepository;
+
+        public JwtService(
+            IOptions<JwtSettings> jwtOptions,
+            UserManager<AppUserEntity> userManager,
+            RefreshTokenRepository refreshTokenRepository)
+        {
+            _jwtSettings = jwtOptions.Value;
+            _userManager = userManager;
+            _refreshTokenRepository = refreshTokenRepository;
+        }
+
+        // вхідна точка генерації пари токенів — викликається і при логіні, і при рефреші
+        public async Task<JwtDto> GenerateTokensAsync(AppUserEntity user)
+        {
+            string accessToken = await GenerateAccessTokenAsync(user);
+            RefreshTokenEntity refreshToken = GenerateRefreshToken();
+            // UserId задаю після генерації, бо GenerateRefreshToken() статичний і не знає про юзера
+            refreshToken.UserId = user.Id;
+
+            await _refreshTokenRepository.CreateAsync(refreshToken);
+
+            return new JwtDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken.Token,
+                // ExpiresAtUtc — зручність для клієнта, щоб він знав коли рефрешити без парсингу JWT
+                ExpiresAtUtc = DateTime.UtcNow.AddHours(_jwtSettings.ExpHours)
+            };
+        }
+
+        // ротація refresh токена: старий помічаю як використаний, видаю нову пару
+        public async Task<JwtDto> RefreshAsync(string refreshToken)
+        {
+            var oldToken = await _refreshTokenRepository.GetByTokenAsync(refreshToken);
+
+            // три причини відмови в одному if — навмисно одне й те саме повідомлення,
+            // щоб зловмисник не міг визначити чому саме токен не пройшов
+            if (oldToken == null || oldToken.IsExpired || oldToken.IsUsed)
+            {
+                throw new InvalidOperationException("Refresh token недійсний.");
+            }
+
+            var user = await _userManager.FindByIdAsync(oldToken.UserId);
+            if (user == null)
+            {
+                throw new InvalidOperationException("Refresh token недійсний.");
+            }
+
+            // позначаю як використаний ДО генерації нового — захист від повторного використання
+            oldToken.IsUsed = true;
+            await _refreshTokenRepository.UpdateAsync(oldToken);
+
+            return await GenerateTokensAsync(user);
+        }
+
+        private async Task<string> GenerateAccessTokenAsync(AppUserEntity user)
+        {
+            // падаю одразу, бо без ключа далі буде незрозуміла крипто-помилка
+            if (string.IsNullOrWhiteSpace(_jwtSettings.SecretKey))
+            {
+                throw new ArgumentNullException(nameof(_jwtSettings.SecretKey), "Jwt secret key is null");
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var claims = new List<Claim>
+            {
+                new(ClaimTypes.NameIdentifier, user.Id),
+                new(ClaimTypes.Name, user.UserName ?? string.Empty),
+                new(ClaimTypes.Email, user.Email ?? string.Empty),
+                // firstName, lastName, image — нестандартні claims, потрібні фронтенду без окремого запиту
+                new("firstName", user.FirstName ?? string.Empty),
+                new("lastName", user.LastName ?? string.Empty),
+                new("image", user.Image ?? string.Empty)
+            };
+
+            // ролей може бути кілька — додаю кожну окремим claim, так ASP.NET їх і очікує
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
+            // HMAC-SHA256 — симетричне підписання, той самий ключ і для підпису, і для перевірки
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _jwtSettings.Issuer,
+                audience: _jwtSettings.Audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(_jwtSettings.ExpHours),
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private static RefreshTokenEntity GenerateRefreshToken()
+        {
+            // 64 байти через криптографічно стійкий RNG — не Random, а справжня ентропія
+            var bytes = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(bytes);
+
+            return new RefreshTokenEntity
+            {
+                Token = Convert.ToBase64String(bytes),
+                // 7 днів — збігається з інтервалом очищення в Quartz job (DeleteExpiredOlderThanDaysAsync(7))
+                Expires = DateTime.UtcNow.AddDays(7),
+                IsUsed = false
+            };
+        }
+    }
+}
+
+--- Cars.BLL/Services/ManufactureService.cs ---
+
+using AutoMapper;
+using Cars.BLL.Dtos.Common;
+using Cars.BLL.Dtos.Manufacture;
+using Cars.DAL;
+using Cars.DAL.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace Cars.BLL.Services
+{
+    public class ManufactureService
+    {
+        private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
+
+        public ManufactureService(AppDbContext context, IMapper mapper)
+        {
+            _context = context;
+            _mapper = mapper;
+        }
+
+        public async Task<PagedDataDto<ManufactureItemDto>> GetAllAsync(int page, int pageSize)
+        {
+            NormalizePaging(ref page, ref pageSize);
+
+            var query = _context.Manufactures.AsNoTracking().OrderBy(x => x.Id);
+
+            var totalCount = await query.CountAsync();
+            var entities = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var items = _mapper.Map<List<ManufactureItemDto>>(entities);
+
+            return new PagedDataDto<ManufactureItemDto>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
+        }
+
+        public async Task<ManufactureItemDto?> GetByIdAsync(int id)
+        {
+            var entity = await _context.Manufactures
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            return entity == null ? null : _mapper.Map<ManufactureItemDto>(entity);
+        }
+
+        public async Task<ManufactureItemDto> CreateAsync(CreateManufactureDto dto)
+        {
+            // тримлю спочатку, щоб перевіряти унікальність і зберігати вже очищене значення
+            string name = dto.Name.Trim();
+
+            // ToLower() в LINQ-to-DB — бо OrdinalIgnoreCase не транслюється в SQL
+            bool exists = await _context.Manufactures
+                .AnyAsync(x => x.Name.ToLower() == name.ToLower());
+
+            if (exists)
+            {
+                throw new ArgumentException("Manufacture with this name already exists.");
+            }
+
+            var entity = _mapper.Map<ManufactureEntity>(dto);
+            // перезаписую після mapper — хочу зберігати саме тримлене значення
+            entity.Name = name;
+
+            _context.Manufactures.Add(entity);
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<ManufactureItemDto>(entity);
+        }
+
+        public async Task<ManufactureItemDto?> UpdateAsync(int id, UpdateManufactureDto dto)
+        {
+            // захист від неузгодженості route id і body id — клієнт може зіслати чужий id у тілі
+            if (dto.Id != id)
+            {
+                throw new ArgumentException("Route id and body id do not match.");
+            }
+
+            var entity = await _context.Manufactures.FirstOrDefaultAsync(x => x.Id == id);
+            if (entity == null)
+            {
+                return null;
+            }
+
+            string name = dto.Name.Trim();
+
+            // x.Id != id — виключаю себе, бо запис може залишити свою ж назву
+            bool duplicate = await _context.Manufactures
+                .AnyAsync(x => x.Id != id && x.Name.ToLower() == name.ToLower());
+
+            if (duplicate)
+            {
+                throw new ArgumentException("Manufacture with this name already exists.");
+            }
+
+            _mapper.Map(dto, entity);
+            // перезаписую після mapper — так само як в Create, щоб зберігти тримлене значення
+            entity.Name = name;
+
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<ManufactureItemDto>(entity);
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var entity = await _context.Manufactures.FirstOrDefaultAsync(x => x.Id == id);
+            if (entity == null)
+            {
+                return false;
+            }
+
+            // FK в БД налаштований як Restrict — без цього if БД поверне незрозуміле виняток;
+            // перевіряю сам, щоб дати зрозуміле повідомлення
+            bool hasCars = await _context.Cars.AnyAsync(x => x.ManufactureId == id);
+            if (hasCars)
+            {
+                throw new InvalidOperationException("Cannot delete manufacture that has cars.");
+            }
+
+            _context.Manufactures.Remove(entity);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        private static void NormalizePaging(ref int page, ref int pageSize)
+        {
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 100;
+            if (pageSize > 500) pageSize = 500;
+        }
+    }
+}
+
+--- Cars.BLL/Settings/JwtSettings.cs ---
+
+namespace Cars.BLL.Settings
+{
+    public class JwtSettings
+    {
+        public string Issuer { get; set; } = string.Empty;
+        public string Audience { get; set; } = string.Empty;
+        public string SecretKey { get; set; } = string.Empty;
+        public int ExpHours { get; set; } = 1;
+    }
+}
+
+--- Cars.DAL/AppDbContext.cs ---
+
+using Cars.DAL.Entities;
+using Cars.DAL.Entities.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+
+namespace Cars.DAL
+{
+    public class AppDbContext : IdentityDbContext<AppUserEntity, AppRoleEntity, string>
+    {
+        public AppDbContext(DbContextOptions options)
+            : base(options)
+        {
+        }
+
+        public DbSet<ManufactureEntity> Manufactures { get; set; }
+        public DbSet<CarEntity> Cars { get; set; }
+        public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<ManufactureEntity>(e =>
+            {
+                e.HasKey(x => x.Id);
+
+                e.Property(x => x.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                e.HasIndex(x => x.Name)
+                    .IsUnique();
+            });
+
+            builder.Entity<CarEntity>(e =>
+            {
+                e.HasKey(x => x.Id);
+
+                e.Property(x => x.Name)
+                    .IsRequired()
+                    .HasMaxLength(120);
+
+                e.Property(x => x.Year)
+                    .IsRequired();
+
+                e.Property(x => x.Volume)
+                    .IsRequired()
+                    .HasColumnType("numeric(10,2)");
+
+                e.Property(x => x.Price)
+                    .IsRequired()
+                    .HasColumnType("numeric(12,2)");
+
+                e.Property(x => x.Color)
+                    .IsRequired()
+                    .HasMaxLength(40);
+
+                e.Property(x => x.Description)
+                    .HasColumnType("text");
+
+                e.Property(x => x.Image)
+                    .HasMaxLength(500);
+
+                e.HasOne(x => x.Manufacture)
+                    .WithMany(x => x.Cars)
+                    .HasForeignKey(x => x.ManufactureId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<RefreshTokenEntity>(e =>
+            {
+                e.HasKey(x => x.Id);
+
+                e.Property(x => x.Token)
+                    .IsRequired()
+                    .HasMaxLength(512);
+
+                e.HasIndex(x => x.Token)
+                    .IsUnique();
+
+                e.Property(x => x.Expires)
+                    .IsRequired();
+
+                e.Property(x => x.IsUsed)
+                    .IsRequired();
+
+                e.Property(x => x.UserId)
+                    .IsRequired();
+
+                e.HasOne(x => x.User)
+                    .WithMany(x => x.RefreshTokens)
+                    .HasForeignKey(x => x.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
+    }
+}
+
+--- Cars.DAL/Cars.DAL.csproj ---
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
+</Project>
+
+
+--- Cars.DAL/Entities/CarEntity.cs ---
+
+namespace Cars.DAL.Entities
+{
+    public class CarEntity
+    {
+        public int Id { get; set; }
+        public required string Name { get; set; }
+
+        public int ManufactureId { get; set; }
+        public ManufactureEntity? Manufacture { get; set; }
+
+        public int Year { get; set; }
+        public decimal Volume { get; set; }
+        public decimal Price { get; set; }
+        public required string Color { get; set; }
+
+        public string? Description { get; set; }
+        public string? Image { get; set; }
+    }
+}
+
+--- Cars.DAL/Entities/Identity/AppRoleEntity.cs ---
+
+using Microsoft.AspNetCore.Identity;
+
+namespace Cars.DAL.Entities.Identity
+{
+    public class AppRoleEntity : IdentityRole
+    {
+    }
+}
+
+--- Cars.DAL/Entities/Identity/AppUserEntity.cs ---
+
+using Cars.DAL.Entities;
+using Microsoft.AspNetCore.Identity;
+
+namespace Cars.DAL.Entities.Identity
+{
+    public class AppUserEntity : IdentityUser
+    {
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? Image { get; set; }
+
+        public ICollection<RefreshTokenEntity> RefreshTokens { get; set; } = [];
+    }
+}
+
+--- Cars.DAL/Entities/ManufactureEntity.cs ---
+
+namespace Cars.DAL.Entities
+{
+    public class ManufactureEntity
+    {
+        public int Id { get; set; }
+        public required string Name { get; set; }
+
+        public List<CarEntity> Cars { get; set; } = [];
+    }
+}
+
+--- Cars.DAL/Entities/RefreshTokenEntity.cs ---
+
+using Cars.DAL.Entities.Identity;
+
+namespace Cars.DAL.Entities
+{
+    public class RefreshTokenEntity
+    {
+        public int Id { get; set; }
+        public string Token { get; set; } = string.Empty;
+        public DateTime Expires { get; set; }
+        public bool IsUsed { get; set; }
+        public bool IsExpired => DateTime.UtcNow > Expires;
+
+        public string UserId { get; set; } = string.Empty;
+        public AppUserEntity? User { get; set; }
+    }
+}
+
+--- Cars.DAL/Migrations/20260417125232_InitIdentityAuth.Designer.cs ---
+
+// <auto-generated />
+using System;
+using Cars.DAL;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+
+#nullable disable
+
+namespace Cars.DAL.Migrations
+{
+    [DbContext(typeof(AppDbContext))]
+    [Migration("20260417125232_InitIdentityAuth")]
+    partial class InitIdentityAuth
+    {
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        {
+#pragma warning disable 612, 618
+            modelBuilder
+                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Cars.DAL.Entities.CarEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Image")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("ManufactureId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric(12,2)");
+
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ManufactureId");
+
+                    b.ToTable("Cars");
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.Identity.AppRoleEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.Identity.AppUserEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.ManufactureEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Manufactures");
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.RefreshTokenEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Expires")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("text");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("text");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.CarEntity", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.ManufactureEntity", "Manufacture")
+                        .WithMany("Cars")
+                        .HasForeignKey("ManufactureId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Manufacture");
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.RefreshTokenEntity", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.Identity.AppUserEntity", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.Identity.AppRoleEntity", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.Identity.AppUserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.Identity.AppUserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.Identity.AppRoleEntity", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Cars.DAL.Entities.Identity.AppUserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.Identity.AppUserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.Identity.AppUserEntity", b =>
+                {
+                    b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.ManufactureEntity", b =>
+                {
+                    b.Navigation("Cars");
+                });
+#pragma warning restore 612, 618
+        }
+    }
+}
+
+
+--- Cars.DAL/Migrations/20260417125232_InitIdentityAuth.cs ---
+
+using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+
+#nullable disable
+
+namespace Cars.DAL.Migrations
+{
+    /// <inheritdoc />
+    public partial class InitIdentityAuth : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.CreateTable(
+                name: "AspNetRoles",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    FirstName = table.Column<string>(type: "text", nullable: true),
+                    LastName = table.Column<string>(type: "text", nullable: true),
+                    Image = table.Column<string>(type: "text", nullable: true),
+                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Manufactures",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Manufactures", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetRoleClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    RoleId = table.Column<string>(type: "text", nullable: false),
+                    ClaimType = table.Column<string>(type: "text", nullable: true),
+                    ClaimValue = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    ClaimType = table.Column<string>(type: "text", nullable: true),
+                    ClaimValue = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserClaims_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserLogins",
+                columns: table => new
+                {
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    ProviderKey = table.Column<string>(type: "text", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
+                    UserId = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserLogins_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserRoles",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    RoleId = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserTokens",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserTokens_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Token = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
+                    Expires = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsUsed = table.Column<bool>(type: "boolean", nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshTokens_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Cars",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
+                    ManufactureId = table.Column<int>(type: "integer", nullable: false),
+                    Year = table.Column<int>(type: "integer", nullable: false),
+                    Volume = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric(12,2)", nullable: false),
+                    Color = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    Image = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cars", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Cars_Manufactures_ManufactureId",
+                        column: x => x.ManufactureId,
+                        principalTable: "Manufactures",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetRoleClaims_RoleId",
+                table: "AspNetRoleClaims",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "RoleNameIndex",
+                table: "AspNetRoles",
+                column: "NormalizedName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserClaims_UserId",
+                table: "AspNetUserClaims",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserLogins_UserId",
+                table: "AspNetUserLogins",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserRoles_RoleId",
+                table: "AspNetUserRoles",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "EmailIndex",
+                table: "AspNetUsers",
+                column: "NormalizedEmail");
+
+            migrationBuilder.CreateIndex(
+                name: "UserNameIndex",
+                table: "AspNetUsers",
+                column: "NormalizedUserName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cars_ManufactureId",
+                table: "Cars",
+                column: "ManufactureId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Manufactures_Name",
+                table: "Manufactures",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_Token",
+                table: "RefreshTokens",
+                column: "Token",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_UserId",
+                table: "RefreshTokens",
+                column: "UserId");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "AspNetRoleClaims");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserClaims");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserLogins");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserRoles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Cars");
+
+            migrationBuilder.DropTable(
+                name: "RefreshTokens");
+
+            migrationBuilder.DropTable(
+                name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Manufactures");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
+        }
+    }
+}
+
+
+--- Cars.DAL/Migrations/20260417140323_FinalAuthFilesQuartz.Designer.cs ---
+
+// <auto-generated />
+using System;
+using Cars.DAL;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+
+#nullable disable
+
+namespace Cars.DAL.Migrations
+{
+    [DbContext(typeof(AppDbContext))]
+    [Migration("20260417140323_FinalAuthFilesQuartz")]
+    partial class FinalAuthFilesQuartz
+    {
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        {
+#pragma warning disable 612, 618
+            modelBuilder
+                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Cars.DAL.Entities.CarEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Image")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("ManufactureId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric(12,2)");
+
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ManufactureId");
+
+                    b.ToTable("Cars");
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.Identity.AppRoleEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.Identity.AppUserEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.ManufactureEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Manufactures");
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.RefreshTokenEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Expires")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("text");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("text");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.CarEntity", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.ManufactureEntity", "Manufacture")
+                        .WithMany("Cars")
+                        .HasForeignKey("ManufactureId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Manufacture");
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.RefreshTokenEntity", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.Identity.AppUserEntity", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.Identity.AppRoleEntity", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.Identity.AppUserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.Identity.AppUserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.Identity.AppRoleEntity", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Cars.DAL.Entities.Identity.AppUserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.Identity.AppUserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.Identity.AppUserEntity", b =>
+                {
+                    b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.ManufactureEntity", b =>
+                {
+                    b.Navigation("Cars");
+                });
+#pragma warning restore 612, 618
+        }
+    }
+}
+
+
+--- Cars.DAL/Migrations/20260417140323_FinalAuthFilesQuartz.cs ---
+
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace Cars.DAL.Migrations
+{
+    /// <inheritdoc />
+    public partial class FinalAuthFilesQuartz : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+
+        }
+    }
+}
+
+
+--- Cars.DAL/Migrations/AppDbContextModelSnapshot.cs ---
+
+// <auto-generated />
+using System;
+using Cars.DAL;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+
+#nullable disable
+
+namespace Cars.DAL.Migrations
+{
+    [DbContext(typeof(AppDbContext))]
+    partial class AppDbContextModelSnapshot : ModelSnapshot
+    {
+        protected override void BuildModel(ModelBuilder modelBuilder)
+        {
+#pragma warning disable 612, 618
+            modelBuilder
+                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Cars.DAL.Entities.CarEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Image")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("ManufactureId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric(12,2)");
+
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ManufactureId");
+
+                    b.ToTable("Cars");
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.Identity.AppRoleEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.Identity.AppUserEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.ManufactureEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Manufactures");
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.RefreshTokenEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Expires")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("text");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("text");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.CarEntity", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.ManufactureEntity", "Manufacture")
+                        .WithMany("Cars")
+                        .HasForeignKey("ManufactureId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Manufacture");
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.RefreshTokenEntity", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.Identity.AppUserEntity", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.Identity.AppRoleEntity", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.Identity.AppUserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.Identity.AppUserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.Identity.AppRoleEntity", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Cars.DAL.Entities.Identity.AppUserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("Cars.DAL.Entities.Identity.AppUserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.Identity.AppUserEntity", b =>
+                {
+                    b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("Cars.DAL.Entities.ManufactureEntity", b =>
+                {
+                    b.Navigation("Cars");
+                });
+#pragma warning restore 612, 618
+        }
+    }
+}
+
+
+--- Cars.DAL/Repositories/RefreshTokenRepository.cs ---
+
+using Cars.DAL.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace Cars.DAL.Repositories
+{
+    public class RefreshTokenRepository
+    {
+        private readonly AppDbContext _context;
+
+        public RefreshTokenRepository(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public IQueryable<RefreshTokenEntity> RefreshTokens => _context.RefreshTokens.AsQueryable();
+
+        public async Task CreateAsync(RefreshTokenEntity entity)
+        {
+            await _context.RefreshTokens.AddAsync(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(RefreshTokenEntity entity)
+        {
+            _context.RefreshTokens.Update(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<RefreshTokenEntity?> GetByTokenAsync(string token)
+        {
+            return await _context.RefreshTokens
+                .FirstOrDefaultAsync(x => x.Token == token);
+        }
+
+        public async Task<int> DeleteExpiredOlderThanDaysAsync(int days)
+        {
+            DateTime threshold = DateTime.UtcNow.AddDays(-days);
+
+            var entities = await _context.RefreshTokens
+                .Where(x => x.Expires < threshold)
+                .ToListAsync();
+
+            if (entities.Count == 0)
+            {
+                return 0;
+            }
+
+            _context.RefreshTokens.RemoveRange(entities);
+            await _context.SaveChangesAsync();
+            return entities.Count;
+        }
+    }
+}
+
+--- Cars.DAL/Seed/DataSeeder.cs ---
+
+using Cars.DAL.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace Cars.DAL.Seed
+{
+    public static class DataSeeder
+    {
+        private const string ToyotaImage = "/images/cars/Toyota-logo.jpg";
+        private const string BmwImage = "/images/cars/BMW-logo.png";
+        private const string AudiImage = "/images/cars/audi-logo.png";
+
+        public static async Task SeedAsync(AppDbContext context)
+        {
+            if (await context.Manufactures.AnyAsync() || await context.Cars.AnyAsync())
+            {
+                return;
+            }
+
+            var toyota = new ManufactureEntity { Name = "Toyota" };
+            var bmw = new ManufactureEntity { Name = "BMW" };
+            var audi = new ManufactureEntity { Name = "Audi" };
+
+            await context.Manufactures.AddRangeAsync(toyota, bmw, audi);
+            await context.SaveChangesAsync();
+
+            var cars = new List<CarEntity>();
+            cars.AddRange(CreateToyotaCars(toyota.Id));
+            cars.AddRange(CreateBmwCars(bmw.Id));
+            cars.AddRange(CreateAudiCars(audi.Id));
+
+            await context.Cars.AddRangeAsync(cars);
+            await context.SaveChangesAsync();
+        }
+
+        private static List<CarEntity> CreateToyotaCars(int manufactureId)
+        {
+            return new List<CarEntity>
+            {
+                new() { Name = "Camry", ManufactureId = manufactureId, Year = 2020, Volume = 2.50m, Price = 25000m, Color = "Black", Description = "Sedan", Image = ToyotaImage },
+                new() { Name = "Corolla", ManufactureId = manufactureId, Year = 2019, Volume = 1.80m, Price = 18000m, Color = "White", Description = "Compact sedan", Image = ToyotaImage },
+                new() { Name = "RAV4", ManufactureId = manufactureId, Year = 2021, Volume = 2.50m, Price = 32000m, Color = "Gray", Description = "SUV", Image = ToyotaImage },
+                new() { Name = "Highlander", ManufactureId = manufactureId, Year = 2022, Volume = 3.50m, Price = 42000m, Color = "Silver", Description = "Family SUV", Image = ToyotaImage },
+                new() { Name = "Yaris", ManufactureId = manufactureId, Year = 2018, Volume = 1.50m, Price = 14000m, Color = "Blue", Description = "City hatchback", Image = ToyotaImage },
+                new() { Name = "Prius", ManufactureId = manufactureId, Year = 2020, Volume = 1.80m, Price = 27000m, Color = "Green", Description = "Hybrid liftback", Image = ToyotaImage },
+                new() { Name = "Land Cruiser", ManufactureId = manufactureId, Year = 2023, Volume = 3.30m, Price = 85000m, Color = "White", Description = "Off-road SUV", Image = ToyotaImage },
+                new() { Name = "C-HR", ManufactureId = manufactureId, Year = 2021, Volume = 2.00m, Price = 26000m, Color = "Red", Description = "Compact crossover", Image = ToyotaImage },
+                new() { Name = "Avalon", ManufactureId = manufactureId, Year = 2019, Volume = 3.50m, Price = 36000m, Color = "Brown", Description = "Full-size sedan", Image = ToyotaImage },
+                new() { Name = "Supra", ManufactureId = manufactureId, Year = 2022, Volume = 3.00m, Price = 52000m, Color = "Yellow", Description = "Sports coupe", Image = ToyotaImage }
+            };
+        }
+
+        private static List<CarEntity> CreateBmwCars(int manufactureId)
+        {
+            return new List<CarEntity>
+            {
+                new() { Name = "3 Series", ManufactureId = manufactureId, Year = 2021, Volume = 2.00m, Price = 41000m, Color = "Black", Description = "Sport sedan", Image = BmwImage },
+                new() { Name = "5 Series", ManufactureId = manufactureId, Year = 2022, Volume = 2.00m, Price = 56000m, Color = "Gray", Description = "Business sedan", Image = BmwImage },
+                new() { Name = "7 Series", ManufactureId = manufactureId, Year = 2023, Volume = 3.00m, Price = 98000m, Color = "Blue", Description = "Luxury sedan", Image = BmwImage },
+                new() { Name = "X1", ManufactureId = manufactureId, Year = 2020, Volume = 2.00m, Price = 39000m, Color = "White", Description = "Compact SUV", Image = BmwImage },
+                new() { Name = "X3", ManufactureId = manufactureId, Year = 2021, Volume = 2.00m, Price = 49000m, Color = "Silver", Description = "Mid-size SUV", Image = BmwImage },
+                new() { Name = "X5", ManufactureId = manufactureId, Year = 2021, Volume = 3.00m, Price = 65000m, Color = "Gray", Description = "SUV", Image = BmwImage },
+                new() { Name = "X7", ManufactureId = manufactureId, Year = 2022, Volume = 3.00m, Price = 92000m, Color = "Black", Description = "Large luxury SUV", Image = BmwImage },
+                new() { Name = "M3", ManufactureId = manufactureId, Year = 2022, Volume = 3.00m, Price = 74000m, Color = "Green", Description = "Performance sedan", Image = BmwImage },
+                new() { Name = "M5", ManufactureId = manufactureId, Year = 2023, Volume = 4.40m, Price = 108000m, Color = "Red", Description = "High-performance sedan", Image = BmwImage },
+                new() { Name = "i4", ManufactureId = manufactureId, Year = 2023, Volume = 1.00m, Price = 62000m, Color = "White", Description = "Electric gran coupe", Image = BmwImage }
+            };
+        }
+
+        private static List<CarEntity> CreateAudiCars(int manufactureId)
+        {
+            return new List<CarEntity>
+            {
+                new() { Name = "A3", ManufactureId = manufactureId, Year = 2020, Volume = 1.50m, Price = 35000m, Color = "White", Description = "Compact sedan", Image = AudiImage },
+                new() { Name = "A4", ManufactureId = manufactureId, Year = 2021, Volume = 2.00m, Price = 43000m, Color = "Black", Description = "Sedan", Image = AudiImage },
+                new() { Name = "A5", ManufactureId = manufactureId, Year = 2022, Volume = 2.00m, Price = 47000m, Color = "Blue", Description = "Sportback", Image = AudiImage },
+                new() { Name = "A6", ManufactureId = manufactureId, Year = 2022, Volume = 2.00m, Price = 57000m, Color = "Gray", Description = "Business sedan", Image = AudiImage },
+                new() { Name = "A7", ManufactureId = manufactureId, Year = 2023, Volume = 3.00m, Price = 79000m, Color = "Silver", Description = "Luxury sportback", Image = AudiImage },
+                new() { Name = "Q3", ManufactureId = manufactureId, Year = 2021, Volume = 2.00m, Price = 41000m, Color = "Red", Description = "Compact SUV", Image = AudiImage },
+                new() { Name = "Q5", ManufactureId = manufactureId, Year = 2021, Volume = 2.00m, Price = 51000m, Color = "Black", Description = "Mid-size SUV", Image = AudiImage },
+                new() { Name = "Q7", ManufactureId = manufactureId, Year = 2022, Volume = 3.00m, Price = 72000m, Color = "White", Description = "Large SUV", Image = AudiImage },
+                new() { Name = "TT", ManufactureId = manufactureId, Year = 2019, Volume = 2.00m, Price = 49000m, Color = "Yellow", Description = "Sports coupe", Image = AudiImage },
+                new() { Name = "e-tron GT", ManufactureId = manufactureId, Year = 2023, Volume = 1.00m, Price = 104000m, Color = "Gray", Description = "Electric performance sedan", Image = AudiImage }
+            };
+        }
+    }
+}
+
+--- Cars.DAL/Seed/Seeder.cs ---
+
+using Cars.DAL.Entities.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Cars.DAL.Seed
+{
+    public static class Seeder
+    {
+        public static async Task SeedAsync(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<AppRoleEntity>>();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUserEntity>>();
+
+            await context.Database.MigrateAsync();
+
+            await SeedRolesAsync(roleManager);
+            await SeedUsersAsync(userManager);
+
+            await DataSeeder.SeedAsync(context);
+        }
+
+        private static async Task SeedRolesAsync(RoleManager<AppRoleEntity> roleManager)
+        {
+            if (!await roleManager.RoleExistsAsync("admin"))
+            {
+                await roleManager.CreateAsync(new AppRoleEntity { Name = "admin" });
+            }
+
+            if (!await roleManager.RoleExistsAsync("user"))
+            {
+                await roleManager.CreateAsync(new AppRoleEntity { Name = "user" });
+            }
+        }
+
+        private static async Task SeedUsersAsync(UserManager<AppUserEntity> userManager)
+        {
+            var admin = await userManager.FindByEmailAsync("admin@mail.com");
+            if (admin == null)
+            {
+                admin = new AppUserEntity
+                {
+                    UserName = "admin",
+                    Email = "admin@mail.com",
+                    EmailConfirmed = true,
+                    FirstName = "Admin",
+                    LastName = "Cars"
+                };
+
+                await userManager.CreateAsync(admin, "qwerty");
+                await userManager.AddToRoleAsync(admin, "admin");
+            }
+
+            var user = await userManager.FindByEmailAsync("user@mail.com");
+            if (user == null)
+            {
+                user = new AppUserEntity
+                {
+                    UserName = "user",
+                    Email = "user@mail.com",
+                    EmailConfirmed = true,
+                    FirstName = "User",
+                    LastName = "Cars"
+                };
+
+                await userManager.CreateAsync(user, "qwerty");
+                await userManager.AddToRoleAsync(user, "user");
+            }
+        }
+    }
+}
