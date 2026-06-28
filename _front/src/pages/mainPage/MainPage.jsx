@@ -1,6 +1,7 @@
 import { Button } from "@mui/material";
 import { Link } from "react-router-dom";
 
+// Проста навігаційна сторінка — ніякого стейту, тільки посилання
 const MainPage = () => {
     return (
         <>

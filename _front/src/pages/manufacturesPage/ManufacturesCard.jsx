@@ -19,6 +19,7 @@ const ManufacturesCard = ({ manufacture, canManage }) => {
     const deleteClickHandle = async () => {
         try {
             await api.delete(`manufactures/${manufacture.id}`);
+            // Оновлюю store локально — не роблю повторний GET після DELETE
             dispatch({ type: "deletemanufacture", payload: manufacture.id });
         } catch (error) {
             console.log(error);
@@ -51,6 +52,7 @@ const ManufacturesCard = ({ manufacture, canManage }) => {
                     </Link>
                 )}
 
+                {/* Формую URL-фільтр — CarListPage автоматично покаже авто цього виробника */}
                 <Link to={`/cars?manufactureId=${manufacture.id}`}>
                     <Button size="small">Переглянути авто</Button>
                 </Link>

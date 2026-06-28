@@ -8,6 +8,8 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import OutlinedInput from "@mui/material/OutlinedInput";
 
+// UI-заглушка: форма відображається але реальний запит не надсилається.
+// Знаю що це не функціонально — в продакшн треба POST на auth/forgot-password
 function ForgotPassword({ open, handleClose }) {
     return (
         <Dialog
@@ -18,6 +20,7 @@ function ForgotPassword({ open, handleClose }) {
                     component: "form",
                     onSubmit: (event) => {
                         event.preventDefault();
+                        // Просто закриваю — більше нічого не відбувається
                         handleClose();
                     },
                     sx: { backgroundImage: "none" },

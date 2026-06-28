@@ -21,8 +21,11 @@ import RegisterPage from "./pages/auth/registerPage/RegisterPage";
 function App() {
     const { isAuth, isAdmin, isHydrated } = useAuth();
 
+    // isDark тут а не в Navbar, бо ThemeProvider теж тут — він обгортає всі маршрути
     const [isDark, setIsDark] = useState(false);
 
+    // Чекаю поки AuthContext прочитає localStorage — інакше Admin-маршрути
+    // не зареєструються при першому рендері і прямий перехід дасть 404
     if (!isHydrated) {
         return null;
     }
@@ -31,6 +34,7 @@ function App() {
         <>
             <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
                 <Routes>
+                    {/* DefaultLayout — спільна обгортка (Navbar+Footer) для всіх сторінок */}
                     <Route
                         path="/"
                         element={
@@ -45,6 +49,8 @@ function App() {
                         <Route path="cars">
                             <Route index element={<CarListPage />} />
                             <Route path=":id" element={<CarDetailsPage />} />
+                            {/* Guard: якщо умова false — маршрут взагалі не реєструється.
+                                При спробі зайти — відпрацює * і покаже NotFoundPage */}
                             {isAuth && isAdmin && (
                                 <>
                                     <Route
@@ -61,6 +67,7 @@ function App() {
 
                         <Route path="Manufactures">
                             <Route index element={<ManufacturesListPage />} />
+                            {/* Той самий guard що і для cars */}
                             {isAuth && isAdmin && (
                                 <>
                                     <Route
@@ -75,6 +82,8 @@ function App() {
                             )}
                         </Route>
 
+                        {/* Ховаю login/register якщо вже авторизований — щоб не було
+                            безглуздого повернення на форму входу будучи в системі */}
                         {!isAuth && (
                             <>
                                 <Route path="login" element={<LoginPage />} />
@@ -85,6 +94,7 @@ function App() {
                             </>
                         )}
 
+                        {/* Catch-all — будь-який невідомий або закритий маршрут */}
                         <Route path="*" element={<NotFoundPage />} />
                     </Route>
                 </Routes>

@@ -16,9 +16,13 @@ import { useAuth } from "../../context/AuthContext";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 
+// Масив пунктів меню користувача — значення використовуються тільки як UI-мітки
 const settings = ["Профіль", "Вийти"];
 
+// isDark/setIsDark приходять з App.jsx бо ThemeProvider теж там
 const Navbar = ({ isDark, setIsDark }) => {
+    // anchorEl* — MUI-патерн для прив'язки Popover-меню до елементу:
+    // null = закрито, DOM-елемент = відкрито
     const [anchorElNav, setAnchorElNav] = useState(null);
     const [anchorElUser, setAnchorElUser] = useState(null);
 
@@ -40,6 +44,7 @@ const Navbar = ({ isDark, setIsDark }) => {
     };
 
     const logoutButtonHandler = () => {
+        // Спочатку закриваю меню, потім логаут — щоб не було анімаційного артефакту
         logout();
         handleCloseUserMenu();
     };
@@ -162,6 +167,7 @@ const Navbar = ({ isDark, setIsDark }) => {
                         </Link>
                     </Box>
                     <Box sx={{ flexGrow: 0, mx: 5 }}>
+                        {/* Іконка протилежна до поточного стану — показую що буде після кліку */}
                         <IconButton
                             onClick={changeThemeHandle}
                             sx={{ color: "white" }}
@@ -170,6 +176,7 @@ const Navbar = ({ isDark, setIsDark }) => {
                         </IconButton>
                     </Box>
                     <Box sx={{ flexGrow: 0 }}>
+                        {/* Авторизований — Avatar+меню з виходом; ні — кнопки Увійти/Реєстрація */}
                         {isAuth ? (
                             <>
                                 <Tooltip title="Open settings">

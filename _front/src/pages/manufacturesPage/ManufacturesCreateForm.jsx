@@ -70,6 +70,7 @@ const ManufacturesCreateForm = () => {
         });
         if (response.status === 200 || response.status === 201) {
             const createdmanufacture = getEntity(response);
+            // Оновлюю store одразу з відповіддю — не роблю повторний GET
             dispatch({ type: "createmanufacture", payload: createdmanufacture });
             navigate("/Manufactures");
         }

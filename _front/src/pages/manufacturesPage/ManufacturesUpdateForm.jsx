@@ -67,6 +67,9 @@ const ManufacturesUpdateForm = () => {
     const { id } = useParams();
     const { Manufactures } = useSelector((state) => state.manufacture);
 
+    // Ключова особливість: не роблю GET-запит — беру дані з Redux store.
+    // Працює тільки якщо перед цим відвідали ManufacturesListPage (список вже в store).
+    // Слабке місце: при прямому переході на /update/:id форма буде порожньою
     useEffect(() => {
         const manufacture = Manufactures.find(a => a.id == id);
         if (manufacture) {
@@ -84,6 +87,8 @@ const ManufacturesUpdateForm = () => {
         });
         if (response.status === 200) {
             const updated = getEntity(response);
+            // Замінюю один елемент у копії масиву — немає вбудованого updateOne
+            // бо використовую ручний reducer замість createSlice з EntityAdapter
             const index = Manufactures.findIndex(a => a.id == newmanufacture.id);
             let newManufactures = [...Manufactures];
             if (index !== -1) newManufactures[index] = updated;

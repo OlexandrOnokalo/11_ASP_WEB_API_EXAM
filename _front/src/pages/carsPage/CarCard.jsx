@@ -11,6 +11,8 @@ import { toImageSrc } from "../../services/imageUrl";
 const CarCard = ({ car, onDelete, canManage }) => {
     const dispatch = useDispatch();
     const deleteClickHandle = async () => {
+        // Якщо батьківський передав onDelete — делегуюю йому,
+        // інакше роблю DELETE сам і диспатчу оновлення store
         if (onDelete) {
             onDelete(car.id);
             return;
@@ -18,6 +20,7 @@ const CarCard = ({ car, onDelete, canManage }) => {
         if(!confirm('Видалити автомобіль?')) return;
         try {
             await api.delete(`cars/${car.id}`);
+            // Оновлюю store локально — не роблю повторний GET після DELETE
             dispatch({ type: 'deletecar', payload: car.id });
         } catch(e){ console.error(e) }
     };
@@ -36,6 +39,7 @@ const CarCard = ({ car, onDelete, canManage }) => {
             </CardContent>
             <CardActions>
                 <Button size="small" component={Link} to={`/cars/${car.id}`}>Деталі</Button>
+                {/* canManage = isAdmin — приходить з CarListPage */}
                 {canManage && <Button size="small" component={Link} to={`/cars/update/${car.id}`}>Редагувати</Button>}
                 {canManage && <Button size="small" color="error" onClick={deleteClickHandle}>Видалити</Button>}
             </CardActions>

@@ -29,6 +29,7 @@ export default function CarCreateForm(){
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [manufactures, setManufactures] = useState([]);
+    // Завантажую виробників для <select> одразу при монтуванні
     useEffect(()=> {
         api.get("manufactures", { params: { page:1, page_size:200 }}).then(r=>{
             setManufactures(getItems(r));
@@ -39,6 +40,7 @@ export default function CarCreateForm(){
         validationSchema: schema,
         onSubmit: async (values) => {
             try {
+                // Відправляю multipart/form-data бо є файл зображення
                 const formData = new FormData();
                 formData.append("name", values.name);
                 formData.append("manufactureId", String(Number(values.manufactureId)));
@@ -47,12 +49,15 @@ export default function CarCreateForm(){
                 formData.append("price", String(Number(values.price)));
                 formData.append("color", values.color);
                 formData.append("description", values.description || "");
+                // Typo на бекенді — відправляю обидва варіанти допоки не виправлять
                 formData.append("desciption", values.description || "");
+                // Додаю файл тільки якщо вибраний — порожній файл не шлю
                 if (values.image instanceof File) {
                     formData.append("image", values.image);
                 }
 
                 await api.post("cars", formData);
+                // Після створення роблю refetch списку і оновлюю Redux
                 const listRes = await api.get("cars", { params: { page: 1, page_size: 100 } });
                 dispatch({ type: 'loadcars', payload: getItems(listRes) });
                 navigate('/cars');
@@ -76,6 +81,7 @@ export default function CarCreateForm(){
                     <input name="price" placeholder="Ціна" value={formik.values.price} onChange={formik.handleChange} />
                     <input name="color" placeholder="Колір" value={formik.values.color} onChange={formik.handleChange} />
                     <input name="description" placeholder="Опис" value={formik.values.description} onChange={formik.handleChange} />
+                    {/* setFieldValue — бо input[type=file] не підтримує handleChange */}
                     <input
                         type="file"
                         name="image"

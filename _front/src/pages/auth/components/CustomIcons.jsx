@@ -1,3 +1,5 @@
+// SVG-іконки як React-компоненти — обгорнуті в MUI SvgIcon щоб переймали тему і розмір.
+// Використовуються тільки як декорація на LoginPage/RegisterPage
 import SvgIcon from '@mui/material/SvgIcon';
 
 export function SitemarkIcon() {

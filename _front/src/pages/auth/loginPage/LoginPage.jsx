@@ -59,8 +59,10 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 const LoginPage = () => {
+    // open — стан модалки ForgotPassword
     const [open, setOpen] = useState(false);
     const [errors, setErrors] = useState({});
+    // useRef замість formik/useState — uncontrolled inputs, читаю значення тільки при сабміті
     const emailRef = useRef(null);
     const passwordRef = useRef(null);
     const navigate = useNavigate();
@@ -82,6 +84,8 @@ const LoginPage = () => {
             password: passwordRef.current.value,
         };
 
+        // Своя валідація замість yup — LoginPage написана раніше RegisterPage,
+        // де вже є formik. Знаю що непослідовно, але логіку не чіпаю
         const result = validate(cred);
         if (!result.result) {
             setErrors(result.errors);
@@ -96,6 +100,7 @@ const LoginPage = () => {
             return;
         }
 
+        // replace: true — щоб кнопка "назад" не повертала на сторінку логіну
         navigate("/", { replace: true });
     };
 
@@ -213,6 +218,7 @@ const LoginPage = () => {
                             gap: 2,
                         }}
                     >
+                        {/* Google/Facecar — UI-заглушки, alert тільки для демонстрації */}
                         <Button
                             fullWidth
                             variant="outlined"

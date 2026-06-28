@@ -31,6 +31,7 @@ export default function CarUpdateForm(){
     const dispatch = useDispatch();
     const { id } = useParams();
     const [manufactures, setManufactures] = useState([]);
+    // initial — поточні дані авто з сервера, чекаю async перед ініціалізацією formik
     const [initial, setInitial] = useState(null);
 
     useEffect(()=> {
@@ -46,6 +47,8 @@ export default function CarUpdateForm(){
     },[id]);
 
     const formik = useFormik({
+        // enableReinitialize — ключова опція: коли initial завантажиться async,
+        // formik перезапише поля з новими initialValues. Без цього форма б залишилась порожньою
         enableReinitialize: true,
         initialValues: initial ? {
             name: initial.name || '',
@@ -54,6 +57,7 @@ export default function CarUpdateForm(){
             volume: initial.volume || 1.6,
             price: initial.price || 0,
             color: initial.color || '',
+            // Читаю обидва варіанти — typo на бекенді створив два поля
             description: initial.description || initial.desciption || '',
             image: null
         } : { name:'', manufactureId:0, year:new Date().getFullYear(), volume:1.6, price:0, color:'', description:'', image:null },
@@ -68,12 +72,14 @@ export default function CarUpdateForm(){
                 formData.append("price", String(Number(values.price)));
                 formData.append("color", values.color);
                 formData.append("description", values.description || "");
+                // Typo на бекенді — відправляю обидва варіанти допоки не виправлять
                 formData.append("desciption", values.description || "");
                 if (values.image instanceof File) {
                     formData.append("image", values.image);
                 }
 
                 await api.put(`cars/${id}`, formData);
+                // Після PUT роблю refetch і повертаюсь на сторінку деталів оновленого авто
                 const listRes = await api.get("cars", { params: { page: 1, page_size: 100 } });
                 dispatch({ type: 'loadcars', payload: getItems(listRes) });
                 navigate(`/cars/${id}`);
@@ -97,6 +103,7 @@ export default function CarUpdateForm(){
                     <input name="price" placeholder="Ціна" value={formik.values.price} onChange={formik.handleChange} />
                     <input name="color" placeholder="Колір" value={formik.values.color} onChange={formik.handleChange} />
                     <input name="description" placeholder="Опис" value={formik.values.description} onChange={formik.handleChange} />
+                    {/* Показую поточне зображення тільки якщо воно є */}
                     {initial?.image && <img src={toImageSrc(initial.image)} alt={initial.name} style={{ width: "220px", height: "140px", objectFit: "cover" }} />}
                     <input
                         type="file"

@@ -10,6 +10,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useDispatch, useSelector } from "react-redux";
 import { getItems } from "../../services/responseParsers";
 
+// Константи — щоб не писати рядки ендпоінтів по всьому файлу
 const CARS_ENDPOINT = "cars";
 const MANUFACTURES_ENDPOINT = "manufactures";
 
@@ -19,10 +20,15 @@ const CarListPage = () => {
     const { isAdmin } = useAuth();
     const { cars, isLoaded } = useSelector((state) => state.car);
     const [loading, setLoading] = useState(false);
+    // filters — активні параметри запиту, оновлення цього стейту триґерить fetch
     const [filters, setFilters] = useState({ page:1, page_size:100 });
+    // searchInputs — окремі від filters: це UI-значення полів, щоб не триґерити fetch при кожному keystroke
     const [searchInputs, setSearchInputs] = useState({ name: '', manufactureId: '', year: '', color: '', volume: '', minValue: '', maxValue: '' });
+    // manufactures для select-фільтра — локальний стейт, не Redux
     const [manufactures, setManufactures] = useState([]);
 
+    // URL — єдине джерело правди для фільтрів: CarDetailsPage формує /cars?color=red і
+    // переходить сюди, цей ефект читає URL і автоматично запускає потрібний пошук
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const allowed = ["manufactureId", "year", "color", "volume", "minValue", "maxValue", "name", "page_size", "page"];
@@ -32,6 +38,7 @@ const CarListPage = () => {
         for (const key of allowed) {
             const v = params.get(key);
             if (v !== null && v !== "") {
+                // Числові поля перетворюю — URL завжди повертає рядок
                 if (key === 'page' || key === 'page_size' || key === 'manufactureId' || key === 'minValue' || key === 'maxValue') {
                     parsed[key] = Number(v);
                     inputs[key] = v;
@@ -50,17 +57,20 @@ const CarListPage = () => {
             setLoading(true);
             try {
                 let res;
+                // Цінові фільтри йдуть на окремий ендпоінт /by-price — бекенд так розділив
                 if (filters.minValue || filters.maxValue) {
                     const params = { page: filters.page || 1, page_size: filters.page_size || 100 };
                     if (filters.minValue) params.minValue = filters.minValue;
                     if (filters.maxValue) params.maxValue = filters.maxValue;
                     res = await api.get(`${CARS_ENDPOINT}/by-price`, { params });
                 } else if (filters.name || filters.manufactureId || filters.year || filters.color || filters.volume) {
+                    // Бекенд приймає один property+value — беру перший знайдений за пріоритетом
                     const priority = ['name','manufactureId','year','color','volume'];
                     let prop = priority.find(p => filters[p]);
                     const params = { page: filters.page || 1, page_size: filters.page_size || 100 };
                     if (prop) {
                         if (prop === 'manufactureId') {
+                            // API приймає назву виробника, а не id — шукаю назву з локального списку
                             const manu = manufactures.find(m => String(m.id) === String(filters.manufactureId));
                             if (manu) {
                                 params.property = 'manufacture';
@@ -73,6 +83,7 @@ const CarListPage = () => {
                     }
                     res = await api.get(CARS_ENDPOINT, { params });
                 } else {
+                    // Без фільтрів — просто весь список
                     res = await api.get(CARS_ENDPOINT, { params: { page: filters.page || 1, page_size: filters.page_size || 100 } });
                 }
 
@@ -85,6 +96,7 @@ const CarListPage = () => {
         fetch();
     }, [dispatch, filters]);
 
+    // Список виробників для фільтра — не Redux, бо це локальна потреба тільки цієї сторінки
     useEffect(()=> {
         const fetchM = async () => {
             try {

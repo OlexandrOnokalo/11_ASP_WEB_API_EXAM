@@ -7,6 +7,7 @@ function Copyright() {
             <Link color="inherit" href="#">
                 Car Catalog
             </Link>{" "}
+            {/* Динамічний рік — не треба оновлювати вручну щороку */}
             {new Date().getFullYear()}
             {"."}
         </Typography>

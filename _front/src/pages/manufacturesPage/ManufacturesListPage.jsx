@@ -19,6 +19,7 @@ const ManufacturesListPage = () => {
         const pageCount = 150;
         const page = 1;
 
+        // isLoaded — простий кеш: якщо список вже є в store, повторний GET не роблю
         if (!isLoaded) {
             const response = await api.get("manufactures", { params: { page_size: pageCount, page } });
             const { data, status } = response;
@@ -56,6 +57,7 @@ const ManufacturesListPage = () => {
                         <ManufacturesCard manufacture={a} canManage={isAdmin} />
                     </Grid>
                 ))}
+                {/* Кнопка + на всю ширину якщо рядок повний, інакше у вільну комірку */}
                 {isAdmin && (
                     <Grid size={Manufactures.length % 3 === 0 ? 12 : 4}>
                         <Box

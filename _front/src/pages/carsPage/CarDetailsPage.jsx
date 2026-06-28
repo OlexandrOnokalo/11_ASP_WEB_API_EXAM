@@ -22,6 +22,7 @@ const CarDetailsPage = () => {
                 setCar(data);
             } catch (e) {
                 console.error(e);
+                // Не знайдено або помилка — покажу повідомлення нижче (не знайдено)
                 setCar(null);
             } finally {
                 setLoading(false);
@@ -34,6 +35,8 @@ const CarDetailsPage = () => {
         if (!confirm("Видалити автомобіль?")) return;
         try {
             await api.delete(`cars/${id}`);
+            // Після видалення з деталів Redux не оновлюю — цей компонент піде на список,
+            // і CarListPage там сам 刷неться запитом
             navigate("/cars");
         } catch (e) {
             console.error(e);
@@ -68,6 +71,7 @@ const CarDetailsPage = () => {
                             <Button variant="contained">Назад до списку</Button>
                         </Link>
 
+                        {/* Ці кнопки формують URL і навігують на CarListPage з вже встановленими фільтрами */}
                         <Link to={`/cars?manufactureId=${car.manufacture?.id || ""}`}>
                             <Button variant="contained">Усі від виробника</Button>
                         </Link>

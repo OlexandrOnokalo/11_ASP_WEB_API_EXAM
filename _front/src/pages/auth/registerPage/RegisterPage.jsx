@@ -65,6 +65,7 @@ const RegisterPage = () => {
             email: userData.email,
             userName: userData.userName,
             password: userData.password,
+            // firstName/lastName опціональні — якщо порожні, шлю null а не пустий рядок
             firstName: userData.firstName || null,
             lastName: userData.lastName || null,
         };
@@ -75,6 +76,7 @@ const RegisterPage = () => {
             return;
         }
 
+        // Не логіню автоматично — юзер сам іде на форму входу
         navigate("/login");
     };
 
@@ -88,6 +90,7 @@ const RegisterPage = () => {
         password: string()
             .required("Обов'язкове поле")
             .min(6, "Мінімальна довжина 6 символів"),
+        // ref("password") — yup-посилання на інше поле схеми для порівняння
         confirmPassword: string()
             .required("Обов'язкове поле")
             .min(6, "Мінімальна довжина 6 символів")
